@@ -1,4 +1,4 @@
-PACKAGE  = terraform-aws-ecs-container-definition
+PACKAGE  = terraform-aws-transit-gateway
 GOEXE   ?= /usr/bin/go
 GOPATH   = $(CURDIR)/.gopath
 GOBIN    = $(GOPATH)/bin
