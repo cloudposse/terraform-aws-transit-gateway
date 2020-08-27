@@ -2,7 +2,6 @@ package test
 
 import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -23,10 +22,4 @@ func TestExamplesComplete(t *testing.T) {
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
-
-	// Run `terraform output` to get the value of an output variable
-	outputExample := terraform.Output(t, terraformOptions, "example")
-
-	// Verify we're getting back the outputs we expect
-	assert.Regexp(t, "^Hello world! [0-9]+$", outputExample)
 }
