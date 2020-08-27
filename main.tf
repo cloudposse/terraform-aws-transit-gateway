@@ -4,6 +4,7 @@ locals {
 
 module "base_label" {
   source      = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.19.0"
+  enabled     = var.enabled
   namespace   = var.namespace
   name        = var.name
   stage       = var.stage
@@ -11,11 +12,11 @@ module "base_label" {
   delimiter   = var.delimiter
   attributes  = var.attributes
   tags        = var.tags
-  enabled     = var.enabled
 }
 
 module "tgw_label" {
   source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.19.0"
+  enabled    = var.enabled
   context    = module.base_label.context
   attributes = distinct(compact(concat(module.base_label.attributes, ["tgw"])))
 }
@@ -39,10 +40,10 @@ resource "aws_ec2_transit_gateway_route" "tgw_blackhole_route" {
 
 # Setup RAM for transit Gateway
 module "ram_label" {
-  source  = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.16.0"
-  context = module.base_label.context
-  attributes = distinct(compact(concat(module.base_label.attributes, [
-  "ram"])))
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.19.0"
+  enabled    = var.enabled
+  context    = module.base_label.context
+  attributes = distinct(compact(concat(module.base_label.attributes, ["ram"])))
 }
 
 resource "aws_ram_resource_share" "tgw_ram_share" {
