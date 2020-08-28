@@ -75,9 +75,10 @@ module "transit_gateway_route" {
 
 # Routes from subnets to the Transit Gateway VPC attachments
 module "subnet_route" {
-  source                 = "modules/subnet_route"
-  for_each               = var.config
-  transit_gateway_id     = aws_ec2_transit_gateway.default.id
-  destination_cidr_block = each.value["vpc_cidr"]
-  route_table_ids        = each.value["subnet_route_table_ids"]
+  source                  = "modules/subnet_route"
+  for_each                = var.config
+  transit_gateway_id      = aws_ec2_transit_gateway.default.id
+  provider                = each.value["provider"]
+  route_table_ids         = each.value["subnet_route_table_ids"]
+  destination_cidr_blocks = each.value["vpc_cidr"]
 }

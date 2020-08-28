@@ -3,12 +3,17 @@ variable "transit_gateway_id" {
   description = "Transit Gateway ID"
 }
 
-variable "destination_cidr_block" {
-  type        = string
-  description = "Destination CIDR block"
-}
-
 variable "route_table_ids" {
   type        = set(string)
   description = "Subnet route table IDs"
+}
+
+variable "destination_cidr_blocks" {
+  type        = set(string)
+  description = "Destination CIDR blocks"
+}
+
+variable "provider" {
+  type        = string
+  description = "AWS provider"
 }

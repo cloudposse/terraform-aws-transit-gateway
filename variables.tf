@@ -54,7 +54,7 @@ variable "vpc_attachment_ipv6_support" {
 
 variable "config" {
   type = map(object({
-    provider               = any
+    provider               = string
     vpc_id                 = string
     vpc_cidr               = string
     subnet_ids             = set(string)
@@ -63,6 +63,7 @@ variable "config" {
       blackhole              = bool
       destination_cidr_block = string
     }))
+    route_to = set(string)
   }))
 
   description = "Configuration for Transit Gateway, VPC attachments, Transit Gateway routes, and subnet routes"
