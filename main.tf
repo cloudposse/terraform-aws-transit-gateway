@@ -54,7 +54,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "default" {
 }
 
 # Allow traffic from the Transit Gateway to the VPC attachments
-# Propagations will create propagated routes to the VPC attachments
+# Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
   for_each                       = var.config
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.default[each.key]
@@ -73,8 +73,8 @@ module "transit_gateway_route" {
   config                         = each.value["static_routes"]
 }
 
-# Create routes in the subnets' route tables from subnets to the Transit Gateway VPC attachments
-# Only route to VPCs of the environments defined in `route_to` variable
+# Create routes in the subnets' route tables to roue traffic from subnets to the Transit Gateway VPC attachments
+# Only route to VPCs of the environments defined in `route_to` attribute
 module "subnet_route" {
   source                  = "modules/subnet_route"
   for_each                = var.config
