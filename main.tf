@@ -80,5 +80,5 @@ module "subnet_route" {
   transit_gateway_id      = aws_ec2_transit_gateway.default.id
   provider                = each.value["provider"]
   route_table_ids         = each.value["subnet_route_table_ids"]
-  destination_cidr_blocks = each.value["vpc_cidr"]
+  destination_cidr_blocks = setunion(toset(keys(var.config)), each.value["route_to"])
 }
