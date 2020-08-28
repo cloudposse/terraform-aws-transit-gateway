@@ -1,4 +1,4 @@
-variable "auto_accept" {
+variable "auto_accept_shared_attachments" {
   type        = string
   default     = "enable"
   description = "Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`. Default value: `disable`"
@@ -16,10 +16,16 @@ variable "default_route_table_propagation" {
   description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
 }
 
-variable "add_blackhole_route" {
-  type        = bool
-  default     = true
-  description = "Whether or not to add a blackhole route for 0.0.0.0/0 to the Transit Gateway, default is `true`"
+variable "dns_support" {
+  type        = string
+  default     = "enable"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+}
+
+variable "vpn_ecmp_support" {
+  type        = string
+  default     = "enable"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
 }
 
 variable "allow_external_principals" {
@@ -27,8 +33,36 @@ variable "allow_external_principals" {
   default     = false
   description = "Indicates whether principals outside your organization can be associated with a resource share"
 }
+
 variable "allowed_principles" {
   type        = list(string)
   default     = []
   description = "List of principals allowed to access this share, can be account IDs or Organization ARNs"
+}
+
+variable "vpc_attachment_dns_support" {
+  type        = string
+  default     = "enable"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+}
+
+variable "vpc_attachment_ipv6_support" {
+  type        = string
+  default     = "disable"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+}
+
+variable "config" {
+  type = map(object({
+    provider               = string
+    vpc_id                 = string
+    subnet_ids             = list(string)
+    subnet_route_table_ids = list(string)
+    static_routes = set(object({
+      blackhole              = bool
+      destination_cidr_block = string
+    }))
+  }))
+
+  description = "Configuration for Transit Gateway, VPC attachments, Transit Gateway routes, and subnet routes"
 }
