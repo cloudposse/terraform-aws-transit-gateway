@@ -54,10 +54,11 @@ variable "vpc_attachment_ipv6_support" {
 
 variable "config" {
   type = map(object({
-    provider               = string
+    provider               = any
     vpc_id                 = string
-    subnet_ids             = list(string)
-    subnet_route_table_ids = list(string)
+    vpc_cidr               = string
+    subnet_ids             = set(string)
+    subnet_route_table_ids = set(string)
     static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
