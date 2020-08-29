@@ -71,7 +71,7 @@ module "subnets_dev" {
 locals {
   transit_gateway_config = {
     prod : {
-      provider               = "aws"
+      provider_alias         = "aws"
       vpc_id                 = module.vpc_prod.vpc_id
       vpc_cidr               = module.vpc_prod.vpc_cidr_block
       subnet_ids             = module.subnets_prod.private_subnet_ids
@@ -90,7 +90,7 @@ locals {
     },
 
     staging : {
-      provider               = "aws"
+      provider_alias         = "aws"
       vpc_id                 = module.vpc_staging.vpc_id
       vpc_cidr               = module.vpc_staging.vpc_cidr_block
       subnet_ids             = module.subnets_staging.private_subnet_ids
@@ -109,7 +109,7 @@ locals {
     },
 
     dev : {
-      provider               = "aws"
+      provider_alias         = "aws"
       vpc_id                 = module.vpc_dev.vpc_id
       vpc_cidr               = module.vpc_dev.vpc_cidr_block
       subnet_ids             = module.subnets_dev.private_subnet_ids
