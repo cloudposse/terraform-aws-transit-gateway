@@ -114,8 +114,8 @@ locals {
       vpc_cidr               = module.vpc_dev.vpc_cidr_block
       subnet_ids             = module.subnets_dev.private_subnet_ids
       subnet_route_table_ids = module.subnets_dev.private_route_table_ids
-      route_to               = []
-      static_routes          = []
+      route_to               = null
+      static_routes          = null
     }
   }
 }
