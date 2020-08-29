@@ -16,7 +16,7 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each                                        = var.config
   transit_gateway_id                              = aws_ec2_transit_gateway.default.id
-  provider                                        = each.value["provider"]
+  provider                                        = try(each.value["provider"], "aws")
   vpc_id                                          = each.value["vpc_id"]
   subnet_ids                                      = each.value["subnet_ids"]
   dns_support                                     = var.vpc_attachment_dns_support
@@ -50,16 +50,16 @@ module "transit_gateway_route" {
   for_each                       = var.config
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.default[each.key]
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.default.id
-  config                         = each.value["static_routes"]
+  route_config                   = try(each.value["static_routes"], [])
 }
 
-# Create routes in the subnets' route tables to roue traffic from subnets to the Transit Gateway VPC attachments
+# Create routes in the subnets' route tables to route traffic from subnets to the Transit Gateway VPC attachments
 # Only route to VPCs of the environments defined in `route_to` attribute
 module "subnet_route" {
   source                  = "./modules/subnet_route"
   for_each                = var.config
   transit_gateway_id      = aws_ec2_transit_gateway.default.id
-  provider                = each.value["provider"]
-  route_table_ids         = each.value["subnet_route_table_ids"]
-  destination_cidr_blocks = toset([for i in setintersection(keys(var.config), each.value["route_to"]) : var.config[i]["vpc_cidr"]])
+  provider                = try(each.value["provider"], "aws")
+  route_table_ids         = try(each.value["subnet_route_table_ids"], [])
+  destination_cidr_blocks = toset([for i in setintersection(keys(var.config), try(each.value["route_to"], [])) : var.config[i]["vpc_cidr"]])
 }

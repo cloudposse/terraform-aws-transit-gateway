@@ -75,11 +75,11 @@ variable "config" {
     vpc_cidr               = string
     subnet_ids             = set(string)
     subnet_route_table_ids = set(string)
+    route_to               = set(string)
     static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
     }))
-    route_to = set(string)
   }))
 
   description = "Configuration for Transit Gateway, VPC attachments, Transit Gateway routes, and subnet routes"
