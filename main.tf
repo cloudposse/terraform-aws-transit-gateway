@@ -46,7 +46,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
 # https://docs.aws.amazon.com/vpc/latest/tgw/how-transit-gateways-work.html
 # https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html
 module "transit_gateway_route" {
-  source                         = "modules/transit_gateway_route"
+  source                         = "./modules/transit_gateway_route"
   for_each                       = var.config
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.default[each.key]
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.default.id
@@ -56,7 +56,7 @@ module "transit_gateway_route" {
 # Create routes in the subnets' route tables to roue traffic from subnets to the Transit Gateway VPC attachments
 # Only route to VPCs of the environments defined in `route_to` attribute
 module "subnet_route" {
-  source                  = "modules/subnet_route"
+  source                  = "./modules/subnet_route"
   for_each                = var.config
   transit_gateway_id      = aws_ec2_transit_gateway.default.id
   provider                = each.value["provider"]
