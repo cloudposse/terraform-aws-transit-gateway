@@ -13,26 +13,6 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
   tags               = module.this.tags
 }
 
-# RAM share for Transit Gateway
-resource "aws_ram_resource_share" "default" {
-  name                      = module.this.id
-  allow_external_principals = var.allow_external_principals
-  tags                      = module.this.tags
-}
-
-# Share the Transit Gateway with the Organization
-data "aws_organizations_organization" "default" {}
-
-resource "aws_ram_resource_association" "default" {
-  resource_arn       = aws_ec2_transit_gateway.default.arn
-  resource_share_arn = aws_ram_resource_share.default.id
-}
-
-resource "aws_ram_principal_association" "default" {
-  principal          = data.aws_organizations_organization.default.arn
-  resource_share_arn = aws_ram_resource_share.default.id
-}
-
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each                                        = var.config
   transit_gateway_id                              = aws_ec2_transit_gateway.default.id
@@ -81,5 +61,5 @@ module "subnet_route" {
   transit_gateway_id      = aws_ec2_transit_gateway.default.id
   provider                = each.value["provider"]
   route_table_ids         = each.value["subnet_route_table_ids"]
-  destination_cidr_blocks = toset([for i in setintersection(keys(var.config), each.value["route_to"]) : i["vpc_cidr"]])
+  destination_cidr_blocks = toset([for i in setintersection(keys(var.config), each.value["route_to"]) : var.config[i]["vpc_cidr"]])
 }

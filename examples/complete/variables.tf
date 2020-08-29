@@ -1,4 +1,9 @@
-variable "example" {
+variable "region" {
   type        = string
-  description = "The value which will be passed to the example module"
+  description = "AWS Region"
+}
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "List of availability zones"
 }

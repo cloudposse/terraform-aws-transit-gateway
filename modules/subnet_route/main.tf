@@ -1,6 +1,6 @@
 locals {
   route_config = {
-    for config in setproduct(var.route_table_ids, var.destination_cidr_blocks) : "${config[0]}-${config[1]}" => config
+    for i in setproduct(var.route_table_ids, var.destination_cidr_blocks) : "${i[0]}-${i[1]}" => i
   }
 }
 

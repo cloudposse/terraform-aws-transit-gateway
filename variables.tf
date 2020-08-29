@@ -1,3 +1,9 @@
+variable "ram_resource_share_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM)"
+}
+
 variable "auto_accept_shared_attachments" {
   type        = string
   default     = "enable"
@@ -32,12 +38,6 @@ variable "allow_external_principals" {
   type        = bool
   default     = false
   description = "Indicates whether principals outside your organization can be associated with a resource share"
-}
-
-variable "allowed_principles" {
-  type        = list(string)
-  default     = []
-  description = "List of principals allowed to access this share, can be account IDs or Organization ARNs"
 }
 
 variable "vpc_attachment_dns_support" {
