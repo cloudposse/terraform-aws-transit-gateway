@@ -115,10 +115,10 @@ locals {
       subnet_ids             = module.subnets_dev.private_subnet_ids
       subnet_route_table_ids = module.subnets_dev.private_route_table_ids
       route_to               = []
+      static_routes          = []
     }
   }
 }
-
 
 module "transit_gateway" {
   source = "../../"
@@ -126,5 +126,4 @@ module "transit_gateway" {
   ram_resource_share_enabled = false
   config                     = local.transit_gateway_config
   context                    = module.this.context
-
 }

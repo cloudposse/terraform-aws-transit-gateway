@@ -13,7 +13,7 @@ variable "destination_cidr_blocks" {
   description = "Destination CIDR blocks"
 }
 
-variable "provider" {
+variable "aws_provider" {
   type        = string
   description = "AWS provider"
 }
