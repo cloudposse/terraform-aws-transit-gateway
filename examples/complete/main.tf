@@ -83,7 +83,7 @@ locals {
         },
         {
           blackhole              = false
-          destination_cidr_block = "172.18.0.0/20"
+          destination_cidr_block = "172.16.1.0/24"
         }
       ]
     },
@@ -96,12 +96,8 @@ locals {
       route_to               = ["dev"]
       static_routes = [
         {
-          blackhole              = true
-          destination_cidr_block = "0.0.0.0/0"
-        },
-        {
           blackhole              = false
-          destination_cidr_block = "172.33.0.0/20"
+          destination_cidr_block = "172.32.1.0/24"
         }
       ]
     },
