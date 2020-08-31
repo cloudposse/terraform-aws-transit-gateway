@@ -25,8 +25,17 @@
 
 -->
 
-This is `terraform-aws-transit-gateway` project provides all the scaffolding for a typical well-built Cloud Posse module. It's a template repository you can
-use when creating new repositories.
+Terraform module to provision:
+
+- [AWS Transit Gateway](https://aws.amazon.com/transit-gateway/)
+- [AWS Resource Access Manager (AWS RAM)](https://docs.aws.amazon.com/ram/latest/userguide/what-is.html) Resource Share to share the Transit Gateway with
+  the Organization or another AWS Account (configurable via the variables `ram_resource_share_enabled` and `ram_principal`)
+- [Transit Gateway route table](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html)
+- [Transit Gateway VPC attachments](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-vpc-attachments.html) to connect multiple VPCs via the Transit Gateway
+- Transit Gateway route table propagations to create propagated routes and allow traffic from the Transit Gateway to the VPC attachments
+- Transit Gateway route table associations to allow traffic from the VPC attachments to the Transit Gateway
+- Transit Gateway static routes (static routes have a higher precedence than propagated routes)
+- Subnet routes to route traffic from the subnets in each VPC to the other Transit Gateway VPC attachments
 
 
 ---
@@ -80,12 +89,61 @@ See these links and issues for more details:
 Instead pin to the release tag (e.g. `?ref=tags/x.y.z`) of one of our [latest releases](https://github.com/cloudposse/terraform-aws-transit-gateway/releases).
 
 
-Here's how to invoke this example module in your projects
+Here's how to invoke this module in your projects:
 
 ```hcl
-module "example" {
-  source = "https://github.com/cloudposse/terraform-aws-transit-gateway.git?ref=master"
-  example = "Hello world!"
+locals {
+  transit_gateway_config = {
+    prod : {
+       vpc_id                 = module.vpc_prod.vpc_id
+       vpc_cidr               = module.vpc_prod.vpc_cidr_block
+       subnet_ids             = module.subnets_prod.private_subnet_ids
+       subnet_route_table_ids = module.subnets_prod.private_route_table_ids
+       route_to               = ["staging", "dev"]
+       static_routes = [
+        {
+          blackhole              = true
+          destination_cidr_block = "0.0.0.0/0"
+        },
+        {
+          blackhole              = false
+          destination_cidr_block = "172.16.1.0/24"
+        }
+      ]
+    },
+
+    staging : {
+      vpc_id                 = module.vpc_staging.vpc_id
+      vpc_cidr               = module.vpc_staging.vpc_cidr_block
+      subnet_ids             = module.subnets_staging.private_subnet_ids
+      subnet_route_table_ids = module.subnets_staging.private_route_table_ids
+      route_to               = ["dev"]
+      static_routes = [
+        {
+          blackhole              = false
+          destination_cidr_block = "172.32.1.0/24"
+        }
+      ]
+    },
+
+    dev : {
+      vpc_id                 = module.vpc_dev.vpc_id
+      vpc_cidr               = module.vpc_dev.vpc_cidr_block
+      subnet_ids             = module.subnets_dev.private_subnet_ids
+      subnet_route_table_ids = module.subnets_dev.private_route_table_ids
+      route_to               = null
+      static_routes          = null
+    }
+  }
+}
+
+module "transit_gateway" {
+  source = "git::https://github.com/cloudposse/terraform-aws-transit-gateway.git?ref=master"
+
+  ram_resource_share_enabled = false
+  config                     = local.transit_gateway_config
+
+  context = module.this.context
 }
 ```
 
@@ -187,7 +245,13 @@ Are you using this project or any of our other projects? Consider [leaving a tes
 
 Check out these related projects.
 
-- [terraform-null-label](https://github.com/cloudposse/terraform-null-label) - Terraform module designed to generate consistent names and tags for resources. Use terraform-null-label to implement a strict naming convention.
+- [terraform-null-label](https://github.com/cloudposse/terraform-null-label) - Terraform module designed to generate consistent names and tags for resources. Use terraform-null-label to implement a strict naming convention
+- [terraform-aws-vpc](https://github.com/cloudposse/terraform-aws-vpc) - Terraform Module that defines a VPC with public/private subnets across multiple AZs with Internet Gateways
+- [terraform-aws-vpc-peering](https://github.com/cloudposse/terraform-aws-vpc-peering) - Terraform module to create a peering connection between two VPCs
+- [terraform-aws-kops-vpc-peering](https://github.com/cloudposse/terraform-aws-kops-vpc-peering) - Terraform module to create a peering connection between a backing services VPC and a VPC created by Kops
+- [terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) - Terraform module for public and private subnets provisioning in an existing VPC
+- [terraform-aws-multi-az-subnets](https://github.com/cloudposse/terraform-aws-multi-az-subnets) - Terraform module for multi-AZ public and private subnets provisioning
+- [terraform-aws-named-subnets](https://github.com/cloudposse/terraform-aws-named-subnets) - Terraform module for named subnets provisioning
 
 
 

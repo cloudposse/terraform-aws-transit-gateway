@@ -37,8 +37,32 @@ badges:
 # List any related terraform modules that this module may be used with or that this module depends on.
 related:
   - name: "terraform-null-label"
-    description: "Terraform module designed to generate consistent names and tags for resources. Use terraform-null-label to implement a strict naming convention."
+    description: "Terraform module designed to generate consistent names and tags for resources. Use terraform-null-label to implement a strict naming convention"
     url: "https://github.com/cloudposse/terraform-null-label"
+
+  - name: "terraform-aws-vpc"
+    description: "Terraform Module that defines a VPC with public/private subnets across multiple AZs with Internet Gateways"
+    url: "https://github.com/cloudposse/terraform-aws-vpc"
+
+  - name: "terraform-aws-vpc-peering"
+    description: "Terraform module to create a peering connection between two VPCs"
+    url: "https://github.com/cloudposse/terraform-aws-vpc-peering"
+
+  - name: "terraform-aws-kops-vpc-peering"
+    description: "Terraform module to create a peering connection between a backing services VPC and a VPC created by Kops"
+    url: "https://github.com/cloudposse/terraform-aws-kops-vpc-peering"
+
+  - name: "terraform-aws-dynamic-subnets"
+    description: "Terraform module for public and private subnets provisioning in an existing VPC"
+    url: "https://github.com/cloudposse/terraform-aws-dynamic-subnets"
+
+  - name: "terraform-aws-multi-az-subnets"
+    description: "Terraform module for multi-AZ public and private subnets provisioning"
+    url: "https://github.com/cloudposse/terraform-aws-multi-az-subnets"
+
+  - name: "terraform-aws-named-subnets"
+    description: "Terraform module for named subnets provisioning"
+    url: "https://github.com/cloudposse/terraform-aws-named-subnets"
 
 # List any resources helpful for someone to get started. For example, link to the hashicorp documentation or AWS documentation.
 references:
@@ -57,11 +81,35 @@ references:
 
 # Short description of this project
 description: |-
-  This is `terraform-aws-transit-gateway` project provides all the scaffolding for a typical well-built Cloud Posse module. It's a template repository you can
-  use when creating new repositories.
+  Terraform module to provision:
+
+  - [AWS Transit Gateway](https://aws.amazon.com/transit-gateway/)
+  - [AWS Resource Access Manager (AWS RAM)](https://docs.aws.amazon.com/ram/latest/userguide/what-is.html) Resource Share to share the Transit Gateway with
+    the Organization or another AWS Account (configurable via the variables `ram_resource_share_enabled` and `ram_principal`)
+  - [Transit Gateway route table](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html)
+  - [Transit Gateway VPC attachments](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-vpc-attachments.html) to connect multiple VPCs via the Transit Gateway
+  - Transit Gateway route table propagations to create propagated routes and allow traffic from the Transit Gateway to the VPC attachments
+  - Transit Gateway route table associations to allow traffic from the VPC attachments to the Transit Gateway
+  - Transit Gateway static routes (static routes have a higher precedence than propagated routes)
+  - Subnet routes to route traffic from the subnets in each VPC to the other Transit Gateway VPC attachments
 
 # Introduction to the project
 introduction: |-
+  This module is configurable via the variable `transit_gateway_config` - see [usage](#usage) and [examples](#examples) below.
+
+  The variable `transit_gateway_config` is a map of environment names (e.g. `prod`, `staging`, `dev`) to the environment configurations.
+
+  Each enrironment configuration contains the following fileds:
+
+    - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
+    - `vpc_cidr` - VPC CIDR block.
+    - `subnet_ids` - The IDs of the subnets in the VPC.
+    - `subnet_route_table_ids` - The IDs of the subnet route tables. The route tables are used to add routes to allow traffix from the subnets in one VPC
+      to the other VPC attachments.
+    - `route_to` - A list of environment names to route traffic from the current environment to the specified environments.
+      In the example below, in the `prod` environment we create subnet routes to route traffic from the `prod` subnets to the VPC attachments in the `staging` and `dev` environments.
+    - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
+
   __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
   __NOTE:__ This module does not currently support cross-account VPC attachmmnets (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
@@ -77,12 +125,61 @@ introduction: |-
 
 # How to use this module. Should be an easy example to copy and paste.
 usage: |-
-  Here's how to invoke this example module in your projects
+  Here's how to invoke this module in your projects:
 
   ```hcl
-  module "example" {
-    source = "https://github.com/cloudposse/terraform-aws-transit-gateway.git?ref=master"
-    example = "Hello world!"
+  locals {
+    transit_gateway_config = {
+      prod : {
+         vpc_id                 = module.vpc_prod.vpc_id
+         vpc_cidr               = module.vpc_prod.vpc_cidr_block
+         subnet_ids             = module.subnets_prod.private_subnet_ids
+         subnet_route_table_ids = module.subnets_prod.private_route_table_ids
+         route_to               = ["staging", "dev"]
+         static_routes = [
+          {
+            blackhole              = true
+            destination_cidr_block = "0.0.0.0/0"
+          },
+          {
+            blackhole              = false
+            destination_cidr_block = "172.16.1.0/24"
+          }
+        ]
+      },
+
+      staging : {
+        vpc_id                 = module.vpc_staging.vpc_id
+        vpc_cidr               = module.vpc_staging.vpc_cidr_block
+        subnet_ids             = module.subnets_staging.private_subnet_ids
+        subnet_route_table_ids = module.subnets_staging.private_route_table_ids
+        route_to               = ["dev"]
+        static_routes = [
+          {
+            blackhole              = false
+            destination_cidr_block = "172.32.1.0/24"
+          }
+        ]
+      },
+
+      dev : {
+        vpc_id                 = module.vpc_dev.vpc_id
+        vpc_cidr               = module.vpc_dev.vpc_cidr_block
+        subnet_ids             = module.subnets_dev.private_subnet_ids
+        subnet_route_table_ids = module.subnets_dev.private_route_table_ids
+        route_to               = null
+        static_routes          = null
+      }
+    }
+  }
+
+  module "transit_gateway" {
+    source = "git::https://github.com/cloudposse/terraform-aws-transit-gateway.git?ref=master"
+
+    ram_resource_share_enabled = false
+    config                     = local.transit_gateway_config
+
+    context = module.this.context
   }
   ```
 
