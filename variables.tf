@@ -60,7 +60,6 @@ variable "vpc_attachment_ipv6_support" {
 
 variable "config" {
   type = map(object({
-    provider_alias         = string
     vpc_id                 = string
     vpc_cidr               = string
     subnet_ids             = set(string)

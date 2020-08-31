@@ -16,7 +16,6 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each                                        = var.config
   transit_gateway_id                              = aws_ec2_transit_gateway.default.id
-  provider                                        = each.value["provider_alias"] != null ? each.value["provider_alias"] : "aws"
   vpc_id                                          = each.value["vpc_id"]
   subnet_ids                                      = each.value["subnet_ids"]
   dns_support                                     = var.vpc_attachment_dns_support
@@ -59,7 +58,6 @@ module "subnet_route" {
   source                  = "./modules/subnet_route"
   for_each                = var.config
   transit_gateway_id      = aws_ec2_transit_gateway.default.id
-  provider_alias          = each.value["provider_alias"] != null ? each.value["provider_alias"] : "aws"
   route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
   destination_cidr_blocks = toset([for i in setintersection(keys(var.config), (each.value["route_to"] != null ? each.value["route_to"] : [])) : var.config[i]["vpc_cidr"]])
 }
