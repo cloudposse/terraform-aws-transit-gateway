@@ -118,5 +118,6 @@ module "transit_gateway" {
 
   ram_resource_share_enabled = false
   config                     = local.transit_gateway_config
-  context                    = module.this.context
+
+  context = module.this.context
 }
