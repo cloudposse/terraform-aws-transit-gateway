@@ -54,15 +54,9 @@ func TestExamplesComplete(t *testing.T) {
 	subnetRouteIds := terraform.OutputMap(t, terraformOptions, "subnet_route_ids")
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, 3, len(subnetRouteIds))
-	assert.Equal(t, 0, len(subnetRouteIds["dev"]))
-	assert.Equal(t, 6, len(subnetRouteIds["prod"]))
-	assert.Equal(t, 3, len(subnetRouteIds["staging"]))
 
 	// Run `terraform output` to get the value of an output variable
 	transitGatewayRouteIds := terraform.OutputMap(t, terraformOptions, "transit_gateway_route_ids")
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, 3, len(transitGatewayRouteIds))
-	assert.Equal(t, 0, len(transitGatewayRouteIds["dev"]))
-	assert.Equal(t, 2, len(transitGatewayRouteIds["prod"]))
-	assert.Equal(t, 1, len(transitGatewayRouteIds["staging"]))
 }
