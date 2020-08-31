@@ -9,7 +9,7 @@ variable "transit_gateway_route_table_id" {
 }
 
 variable "route_config" {
-  type = set(object({
+  type = list(object({
     blackhole              = bool
     destination_cidr_block = string
   }))
