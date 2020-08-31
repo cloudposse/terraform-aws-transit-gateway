@@ -61,7 +61,7 @@ We literally have [*hundreds of terraform modules*][terraform_modules] that are 
 
 ## Introduction
 
-__NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`][https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/].
+__NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
 __NOTE:__ This module does not currently support cross-account VPC attachmmnets (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
 because Terraform 0.13 currently does not support sending providers (a single provider or a list/map of providers) into modules with `for_each`.
