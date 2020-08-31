@@ -70,6 +70,21 @@ We literally have [*hundreds of terraform modules*][terraform_modules] that are 
 
 ## Introduction
 
+This module is configurable via the variable `transit_gateway_config` - see [usage](#usage) and [examples](#examples) below.
+
+The variable `transit_gateway_config` is a map of environment names (e.g. `prod`, `staging`, `dev`) to the environment configurations.
+
+Each enrironment configuration contains the following fileds:
+
+  - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
+  - `vpc_cidr` - VPC CIDR block.
+  - `subnet_ids` - The IDs of the subnets in the VPC.
+  - `subnet_route_table_ids` - The IDs of the subnet route tables. The route tables are used to add routes to allow traffix from the subnets in one VPC
+    to the other VPC attachments.
+  - `route_to` - A list of environment names to route traffic from the current environment to the specified environments.
+    In the example below, in the `prod` environment we create subnet routes to route traffic from the `prod` subnets to the VPC attachments in the `staging` and `dev` environments.
+  - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
+
 __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
 __NOTE:__ This module does not currently support cross-account VPC attachmmnets (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
