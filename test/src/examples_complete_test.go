@@ -33,7 +33,7 @@ func TestExamplesComplete(t *testing.T) {
 	defer func() {
 		terraformOptions.Targets = []string{"module.transit_gateway"}
 		terraform.Destroy(t, terraformOptions)
-		terraformOptions.Targets = nil
+		terraformOptions.Targets = []string{"module.vpc_prod", "module.subnets_prod", "module.vpc_staging", "module.subnets_staging", "module.vpc_dev", "module.subnets_dev"}
 		terraform.Destroy(t, terraformOptions)
 	}()
 
