@@ -99,7 +99,7 @@ introduction: |-
 
   The variable `transit_gateway_config` is a map of environment names (e.g. `prod`, `staging`, `dev`) to the environment configurations.
 
-  Each environment configuration contains the following fileds:
+  Each environment configuration contains the following fields:
 
     - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
     - `vpc_cidr` - VPC CIDR block.
@@ -112,7 +112,7 @@ introduction: |-
 
   __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
-  __NOTE:__ This module does not currently support cross-account VPC attachmmnets (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
+  __NOTE:__ This module does not currently support cross-account VPC attachments (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
   because Terraform 0.13 currently does not support sending providers (a single provider or a list/map of providers) into modules with `for_each`.
   See these links and issues for more details:
 
