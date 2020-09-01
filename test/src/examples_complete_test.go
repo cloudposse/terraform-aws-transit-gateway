@@ -30,7 +30,12 @@ func TestExamplesComplete(t *testing.T) {
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer terraform.Destroy(t, terraformOptions)
+	defer func() {
+		terraformOptions.Targets = []string{"module.transit_gateway"}
+		terraform.Destroy(t, terraformOptions)
+		terraformOptions.Targets = nil
+		terraform.Destroy(t, terraformOptions)
+	}()
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
