@@ -74,7 +74,7 @@ This module is configurable via the variable `transit_gateway_config` - see [usa
 
 The variable `transit_gateway_config` is a map of environment names (e.g. `prod`, `staging`, `dev`) to the environment configurations.
 
-Each enrironment configuration contains the following fileds:
+Each environment configuration contains the following fileds:
 
   - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
   - `vpc_cidr` - VPC CIDR block.
@@ -109,7 +109,7 @@ Here's how to invoke this module in your projects:
 ```hcl
 locals {
   transit_gateway_config = {
-    prod : {
+    prod = {
        vpc_id                 = module.vpc_prod.vpc_id
        vpc_cidr               = module.vpc_prod.vpc_cidr_block
        subnet_ids             = module.subnets_prod.private_subnet_ids
@@ -127,7 +127,7 @@ locals {
       ]
     },
 
-    staging : {
+    staging = {
       vpc_id                 = module.vpc_staging.vpc_id
       vpc_cidr               = module.vpc_staging.vpc_cidr_block
       subnet_ids             = module.subnets_staging.private_subnet_ids
@@ -141,7 +141,7 @@ locals {
       ]
     },
 
-    dev : {
+    dev = {
       vpc_id                 = module.vpc_dev.vpc_id
       vpc_cidr               = module.vpc_dev.vpc_cidr_block
       subnet_ids             = module.subnets_dev.private_subnet_ids
@@ -192,8 +192,8 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13.0, < 0.14.0 |
-| aws | >= 3.0, < 4.0 |
+| terraform | >= 0.13.0 |
+| aws | >= 3.0 |
 | local | >= 1.2 |
 | random | >= 2.2 |
 
@@ -201,7 +201,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.0, < 4.0 |
+| aws | >= 3.0 |
 
 ## Inputs
 
