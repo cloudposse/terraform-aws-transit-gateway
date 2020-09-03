@@ -1,25 +1,25 @@
 output "transit_gateway_arn" {
-  value       = aws_ec2_transit_gateway.default.arn
+  value       = try(aws_ec2_transit_gateway.default[0].arn, "")
   description = "Transit Gateway ARN"
 }
 
 output "transit_gateway_id" {
-  value       = aws_ec2_transit_gateway.default.id
+  value       = try(aws_ec2_transit_gateway.default[0].id, "")
   description = "Transit Gateway ID"
 }
 
 output "transit_gateway_route_table_id" {
-  value       = aws_ec2_transit_gateway_route_table.default.id
+  value       = try(aws_ec2_transit_gateway_route_table.default[0].id, "")
   description = "Transit Gateway route table ID"
 }
 
 output "transit_gateway_association_default_route_table_id" {
-  value       = aws_ec2_transit_gateway.default.association_default_route_table_id
+  value       = try(aws_ec2_transit_gateway.default[0].association_default_route_table_id, "")
   description = "Transit Gateway association default route table ID"
 }
 
 output "transit_gateway_propagation_default_route_table_id" {
-  value       = aws_ec2_transit_gateway.default.propagation_default_route_table_id
+  value       = try(aws_ec2_transit_gateway.default[0].propagation_default_route_table_id, "")
   description = "Transit Gateway propagation default route table ID"
 }
 
