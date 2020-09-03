@@ -13,16 +13,6 @@ output "transit_gateway_route_table_id" {
   description = "Transit Gateway route table ID"
 }
 
-output "transit_gateway_association_default_route_table_id" {
-  value       = module.transit_gateway.transit_gateway_association_default_route_table_id
-  description = "Transit Gateway association default route table ID"
-}
-
-output "transit_gateway_propagation_default_route_table_id" {
-  value       = module.transit_gateway.transit_gateway_propagation_default_route_table_id
-  description = "Transit Gateway propagation default route table ID"
-}
-
 output "transit_gateway_vpc_attachment_ids" {
   value       = module.transit_gateway.transit_gateway_vpc_attachment_ids
   description = "Transit Gateway VPC attachment IDs"

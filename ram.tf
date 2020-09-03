@@ -1,4 +1,4 @@
-# Resource Access Manager 9RAM) share for the Transit Gateway
+# Resource Access Manager (RAM) share for the Transit Gateway
 # https://docs.aws.amazon.com/ram/latest/userguide/what-is.html
 resource "aws_ram_resource_share" "default" {
   count                     = var.ram_resource_share_enabled ? 1 : 0
