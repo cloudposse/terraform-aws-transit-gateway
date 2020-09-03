@@ -19,9 +19,9 @@ module "transit_gateway" {
 }
 
 
-# Create the Transit Gateway attachments and routes in the `prod`, `staging` and `dev` accounts
+# Create the Transit Gateway VPC attachments and subnets routes in the `prod`, `staging` and `dev` accounts
 
-module "transit_gateway_attachments_and_routes_prod" {
+module "transit_gateway_vpc_attachments_and_subnet_routes_prod" {
   source = "../../"
 
   # `prod` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
@@ -29,22 +29,26 @@ module "transit_gateway_attachments_and_routes_prod" {
   existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
 
   config = {
-    vpc_id                 = module.vpc_prod.vpc_id
-    vpc_cidr               = module.vpc_prod.vpc_cidr_block
-    subnet_ids             = module.subnets_prod.private_subnet_ids
-    subnet_route_table_ids = module.subnets_prod.private_route_table_ids
-    route_to               = null
-    route_to_cidr_blocks   = [module.vpc_staging.vpc_cidr_block, module.vpc_dev.vpc_cidr_block]
-    static_routes = [
-      {
-        blackhole              = true
-        destination_cidr_block = "0.0.0.0/0"
-      },
-      {
-        blackhole              = false
-        destination_cidr_block = "172.16.1.0/24"
-      }
-    ]
+    prod = {
+      vpc_id                 = module.vpc_prod.vpc_id
+      vpc_cidr               = module.vpc_prod.vpc_cidr_block
+      subnet_ids             = module.subnets_prod.private_subnet_ids
+      subnet_route_table_ids = module.subnets_prod.private_route_table_ids
+      route_to               = null
+      route_to_cidr_blocks = [
+        module.vpc_staging.vpc_cidr_block,
+      module.vpc_dev.vpc_cidr_block]
+      static_routes = [
+        {
+          blackhole              = true
+          destination_cidr_block = "0.0.0.0/0"
+        },
+        {
+          blackhole              = false
+          destination_cidr_block = "172.16.1.0/24"
+        }
+      ]
+    }
   }
 
   context = module.this.context
@@ -54,7 +58,7 @@ module "transit_gateway_attachments_and_routes_prod" {
   }
 }
 
-module "transit_gateway_attachments_and_routes_staging" {
+module "transit_gateway_vpc_attachments_and_subnet_routes_staging" {
   source = "../../"
 
   # `staging` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
@@ -62,18 +66,21 @@ module "transit_gateway_attachments_and_routes_staging" {
   existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
 
   config = {
-    vpc_id                 = module.vpc_staging.vpc_id
-    vpc_cidr               = module.vpc_staging.vpc_cidr_block
-    subnet_ids             = module.subnets_staging.private_subnet_ids
-    subnet_route_table_ids = module.subnets_staging.private_route_table_ids
-    route_to               = null
-    route_to_cidr_blocks   = [module.vpc_dev.vpc_cidr_block]
-    static_routes = [
-      {
-        blackhole              = false
-        destination_cidr_block = "172.32.1.0/24"
-      }
-    ]
+    staging = {
+      vpc_id                 = module.vpc_staging.vpc_id
+      vpc_cidr               = module.vpc_staging.vpc_cidr_block
+      subnet_ids             = module.subnets_staging.private_subnet_ids
+      subnet_route_table_ids = module.subnets_staging.private_route_table_ids
+      route_to               = null
+      route_to_cidr_blocks = [
+      module.vpc_dev.vpc_cidr_block]
+      static_routes = [
+        {
+          blackhole              = false
+          destination_cidr_block = "172.32.1.0/24"
+        }
+      ]
+    }
   }
 
   context = module.this.context
@@ -83,7 +90,7 @@ module "transit_gateway_attachments_and_routes_staging" {
   }
 }
 
-module "transit_gateway_attachments_and_routes_dev" {
+module "transit_gateway_vpc_attachments_and_subnet_routes_dev" {
   source = "../../"
 
   # `dev` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
@@ -91,13 +98,15 @@ module "transit_gateway_attachments_and_routes_dev" {
   existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
 
   config = {
-    vpc_id                 = module.vpc_dev.vpc_id
-    vpc_cidr               = module.vpc_dev.vpc_cidr_block
-    subnet_ids             = module.subnets_dev.private_subnet_ids
-    subnet_route_table_ids = module.subnets_dev.private_route_table_ids
-    route_to               = null
-    route_to_cidr_blocks   = null
-    static_routes          = null
+    dev = {
+      vpc_id                 = module.vpc_dev.vpc_id
+      vpc_cidr               = module.vpc_dev.vpc_cidr_block
+      subnet_ids             = module.subnets_dev.private_subnet_ids
+      subnet_route_table_ids = module.subnets_dev.private_route_table_ids
+      route_to               = null
+      route_to_cidr_blocks   = null
+      static_routes          = null
+    }
   }
 
   context = module.this.context
