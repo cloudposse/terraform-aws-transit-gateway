@@ -1,3 +1,13 @@
+variable "region" {
+  type        = string
+  description = "AWS Region"
+}
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "List of availability zones"
+}
+
 variable "ram_resource_share_enabled" {
   type        = bool
   default     = false
@@ -56,34 +66,4 @@ variable "vpc_attachment_ipv6_support" {
   type        = string
   default     = "disable"
   description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
-}
-
-variable "config" {
-  type = map(object({
-    vpc_id                 = string
-    vpc_cidr               = string
-    subnet_ids             = set(string)
-    subnet_route_table_ids = set(string)
-    route_to               = set(string)
-    route_to_cidr_blocks   = set(string)
-    static_routes = set(object({
-      blackhole              = bool
-      destination_cidr_block = string
-    }))
-  }))
-
-  description = "Configuration for VPC attachments, Transit Gateway routes, and subnet routes"
-  default     = null
-}
-
-variable "existing_transit_gateway_id" {
-  type        = string
-  default     = null
-  description = "Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but will use the existing one"
-}
-
-variable "existing_transit_gateway_route_table_id" {
-  type        = string
-  default     = null
-  description = "Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but will use the existing one"
 }

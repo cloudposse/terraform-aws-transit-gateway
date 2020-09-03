@@ -79,23 +79,17 @@ Each environment configuration contains the following fields:
   - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
   - `vpc_cidr` - VPC CIDR block.
   - `subnet_ids` - The IDs of the subnets in the VPC.
+  - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
   - `subnet_route_table_ids` - The IDs of the subnet route tables. The route tables are used to add routes to allow traffix from the subnets in one VPC
     to the other VPC attachments.
-  - `route_to` - A list of environment names to route traffic from the current environment to the specified environments.
+  - `route_to` - A set of environment names to route traffic from the current environment to the specified environments.
     In the example below, in the `prod` environment we create subnet routes to route traffic from the `prod` subnets to the VPC attachments in the `staging` and `dev` environments.
-  - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
+    Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
+  - `route_to_cidr_blocks` - A set of VPC CIDR blocks to route traffic from the current environment to the specified VPC CIDR blocks.
+    In the example below, in the `staging` environment we create subnet routes to route traffic from the `staging` subnets to the `dev` VPC CIDR.
+    Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
 
 __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
-
-__NOTE:__ This module does not currently support cross-account VPC attachments (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
-because Terraform 0.13 currently does not support sending providers (a single provider or a list/map of providers) into modules with `for_each`.
-See these links and issues for more details:
-
-- https://www.terraform.io/docs/configuration/providers.html
-- https://github.com/hashicorp/terraform/issues/24476
-- https://github.com/hashicorp/terraform/issues/17519
-- https://github.com/hashicorp/terraform/issues/9448
-- https://github.com/hashicorp/terraform/issues/17519
 
 ## Usage
 
@@ -110,12 +104,13 @@ Here's how to invoke this module in your projects:
 locals {
   transit_gateway_config = {
     prod = {
-       vpc_id                 = module.vpc_prod.vpc_id
-       vpc_cidr               = module.vpc_prod.vpc_cidr_block
-       subnet_ids             = module.subnets_prod.private_subnet_ids
-       subnet_route_table_ids = module.subnets_prod.private_route_table_ids
-       route_to               = ["staging", "dev"]
-       static_routes = [
+      vpc_id                 = module.vpc_prod.vpc_id
+      vpc_cidr               = module.vpc_prod.vpc_cidr_block
+      subnet_ids             = module.subnets_prod.private_subnet_ids
+      subnet_route_table_ids = module.subnets_prod.private_route_table_ids
+      route_to               = ["staging", "dev"]
+      route_to_cidr_blocks   = null
+      static_routes = [
         {
           blackhole              = true
           destination_cidr_block = "0.0.0.0/0"
@@ -132,7 +127,8 @@ locals {
       vpc_cidr               = module.vpc_staging.vpc_cidr_block
       subnet_ids             = module.subnets_staging.private_subnet_ids
       subnet_route_table_ids = module.subnets_staging.private_route_table_ids
-      route_to               = ["dev"]
+      route_to               = null
+      route_to_cidr_blocks   = [module.vpc_dev.vpc_cidr_block]
       static_routes = [
         {
           blackhole              = false
@@ -147,6 +143,7 @@ locals {
       subnet_ids             = module.subnets_dev.private_subnet_ids
       subnet_route_table_ids = module.subnets_dev.private_route_table_ids
       route_to               = null
+      route_to_cidr_blocks   = null
       static_routes          = null
     }
   }
@@ -172,6 +169,9 @@ Here is a working example of using this module:
 
 Here are automated tests for the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS):
 - [`test`](test)
+
+Here is an example of using this module in a multi-account environment (with the Transit Gateway in one AWS account and all the VPC attachments and routes in different AWS accounts:
+- [`examples/multi-account`](examples/multi-account)
 
 
 
@@ -211,7 +211,7 @@ Available targets:
 | allow\_external\_principals | Indicates whether principals outside your organization can be associated with a resource share | `bool` | `false` | no |
 | attributes | Additional attributes (e.g. `1`) | `list(string)` | `[]` | no |
 | auto\_accept\_shared\_attachments | Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`. Default value: `disable` | `string` | `"enable"` | no |
-| config | Configuration for Transit Gateway, VPC attachments, Transit Gateway routes, and subnet routes | <pre>map(object({<br>    vpc_id                 = string<br>    vpc_cidr               = string<br>    subnet_ids             = set(string)<br>    subnet_route_table_ids = set(string)<br>    route_to               = set(string)<br>    static_routes = set(object({<br>      blackhole              = bool<br>      destination_cidr_block = string<br>    }))<br>  }))</pre> | n/a | yes |
+| config | Configuration for VPC attachments, Transit Gateway routes, and subnet routes | <pre>map(object({<br>    vpc_id                 = string<br>    vpc_cidr               = string<br>    subnet_ids             = set(string)<br>    subnet_route_table_ids = set(string)<br>    route_to               = set(string)<br>    route_to_cidr_blocks   = set(string)<br>    static_routes = set(object({<br>      blackhole              = bool<br>      destination_cidr_block = string<br>    }))<br>  }))</pre> | `null` | no |
 | context | Single object for setting entire context at once.<br>See description of individual variables for details.<br>Leave string and numeric variables as `null` to use default value.<br>Individual variable settings (non-null) override settings in context object,<br>except for attributes, tags, and additional\_tag\_map, which are merged. | <pre>object({<br>    enabled             = bool<br>    namespace           = string<br>    environment         = string<br>    stage               = string<br>    name                = string<br>    delimiter           = string<br>    attributes          = list(string)<br>    tags                = map(string)<br>    additional_tag_map  = map(string)<br>    regex_replace_chars = string<br>    label_order         = list(string)<br>    id_length_limit     = number<br>  })</pre> | <pre>{<br>  "additional_tag_map": {},<br>  "attributes": [],<br>  "delimiter": null,<br>  "enabled": true,<br>  "environment": null,<br>  "id_length_limit": null,<br>  "label_order": [],<br>  "name": null,<br>  "namespace": null,<br>  "regex_replace_chars": null,<br>  "stage": null,<br>  "tags": {}<br>}</pre> | no |
 | default\_route\_table\_association | Whether resource attachments are automatically associated with the default association route table. Valid values: `disable`, `enable`. Default value: `enable` | `string` | `"disable"` | no |
 | default\_route\_table\_propagation | Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable` | `string` | `"disable"` | no |
@@ -219,6 +219,8 @@ Available targets:
 | dns\_support | Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable` | `string` | `"enable"` | no |
 | enabled | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
+| existing\_transit\_gateway\_id | Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but will use the existing one | `string` | `null` | no |
+| existing\_transit\_gateway\_route\_table\_id | Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but will use the existing one | `string` | `null` | no |
 | id\_length\_limit | Limit `id` to this many characters.<br>Set to `0` for unlimited length.<br>Set to `null` for default, which is `0`.<br>Does not affect `id_full`. | `number` | `null` | no |
 | label\_order | The naming order of the id output and Name tag.<br>Defaults to ["namespace", "environment", "stage", "name", "attributes"].<br>You can omit any of the 5 elements, but at least one must be present. | `list(string)` | `null` | no |
 | name | Solution name, e.g. 'app' or 'jenkins' | `string` | `null` | no |

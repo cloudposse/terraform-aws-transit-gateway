@@ -104,23 +104,17 @@ introduction: |-
     - `vpc_id` - The ID of the VPC for which to create a VPC attachment and route table associations and propagations.
     - `vpc_cidr` - VPC CIDR block.
     - `subnet_ids` - The IDs of the subnets in the VPC.
+    - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
     - `subnet_route_table_ids` - The IDs of the subnet route tables. The route tables are used to add routes to allow traffix from the subnets in one VPC
       to the other VPC attachments.
-    - `route_to` - A list of environment names to route traffic from the current environment to the specified environments.
+    - `route_to` - A set of environment names to route traffic from the current environment to the specified environments.
       In the example below, in the `prod` environment we create subnet routes to route traffic from the `prod` subnets to the VPC attachments in the `staging` and `dev` environments.
-    - `static_routes` - A list of Transit Gateway static route configurations. Note that static routes have a higher precedence than propagated routes.
+      Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
+    - `route_to_cidr_blocks` - A set of VPC CIDR blocks to route traffic from the current environment to the specified VPC CIDR blocks.
+      In the example below, in the `staging` environment we create subnet routes to route traffic from the `staging` subnets to the `dev` VPC CIDR.
+      Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
 
   __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
-
-  __NOTE:__ This module does not currently support cross-account VPC attachments (with the Transit Gateway in one AWS account and the VPCs in other AWS accounts),
-  because Terraform 0.13 currently does not support sending providers (a single provider or a list/map of providers) into modules with `for_each`.
-  See these links and issues for more details:
-
-  - https://www.terraform.io/docs/configuration/providers.html
-  - https://github.com/hashicorp/terraform/issues/24476
-  - https://github.com/hashicorp/terraform/issues/17519
-  - https://github.com/hashicorp/terraform/issues/9448
-  - https://github.com/hashicorp/terraform/issues/17519
 
 
 # How to use this module. Should be an easy example to copy and paste.
@@ -131,12 +125,13 @@ usage: |-
   locals {
     transit_gateway_config = {
       prod = {
-         vpc_id                 = module.vpc_prod.vpc_id
-         vpc_cidr               = module.vpc_prod.vpc_cidr_block
-         subnet_ids             = module.subnets_prod.private_subnet_ids
-         subnet_route_table_ids = module.subnets_prod.private_route_table_ids
-         route_to               = ["staging", "dev"]
-         static_routes = [
+        vpc_id                 = module.vpc_prod.vpc_id
+        vpc_cidr               = module.vpc_prod.vpc_cidr_block
+        subnet_ids             = module.subnets_prod.private_subnet_ids
+        subnet_route_table_ids = module.subnets_prod.private_route_table_ids
+        route_to               = ["staging", "dev"]
+        route_to_cidr_blocks   = null
+        static_routes = [
           {
             blackhole              = true
             destination_cidr_block = "0.0.0.0/0"
@@ -153,7 +148,8 @@ usage: |-
         vpc_cidr               = module.vpc_staging.vpc_cidr_block
         subnet_ids             = module.subnets_staging.private_subnet_ids
         subnet_route_table_ids = module.subnets_staging.private_route_table_ids
-        route_to               = ["dev"]
+        route_to               = null
+        route_to_cidr_blocks   = [module.vpc_dev.vpc_cidr_block]
         static_routes = [
           {
             blackhole              = false
@@ -168,6 +164,7 @@ usage: |-
         subnet_ids             = module.subnets_dev.private_subnet_ids
         subnet_route_table_ids = module.subnets_dev.private_route_table_ids
         route_to               = null
+        route_to_cidr_blocks   = null
         static_routes          = null
       }
     }
@@ -190,6 +187,9 @@ examples: |-
 
   Here are automated tests for the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS):
   - [`test`](test)
+
+  Here is an example of using this module in a multi-account environment (with the Transit Gateway in one AWS account and all the VPC attachments and routes in different AWS accounts:
+  - [`examples/multi-account`](examples/multi-account)
 
 # How to get started quickly
 #quickstart: |-
