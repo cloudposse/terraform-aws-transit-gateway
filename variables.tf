@@ -79,11 +79,17 @@ variable "config" {
 variable "existing_transit_gateway_id" {
   type        = string
   default     = null
-  description = "Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but will use the existing one"
+  description = "Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but instead will use the existing one"
 }
 
 variable "existing_transit_gateway_route_table_id" {
   type        = string
   default     = null
-  description = "Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but will use the existing one"
+  description = "Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but instead will use the existing one"
+}
+
+variable "existing_transit_gateway_vpc_attachment_ids" {
+  type        = set(string)
+  default     = null
+  description = "Existing Transit Gateway VPC Attachment IDs. If provided, the module will not create VPC Attachments but instead will use the existing ones"
 }

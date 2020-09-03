@@ -30,8 +30,9 @@
 | dns\_support | Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable` | `string` | `"enable"` | no |
 | enabled | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
-| existing\_transit\_gateway\_id | Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but will use the existing one | `string` | `null` | no |
-| existing\_transit\_gateway\_route\_table\_id | Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but will use the existing one | `string` | `null` | no |
+| existing\_transit\_gateway\_id | Existing Transit Gateway ID. If provided, the module will not create a Transit Gateway but instead will use the existing one | `string` | `null` | no |
+| existing\_transit\_gateway\_route\_table\_id | Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but instead will use the existing one | `string` | `null` | no |
+| existing\_transit\_gateway\_vpc\_attachment\_ids | Existing Transit Gateway VPC Attachment IDs. If provided, the module will not create VPC Attachments but instead will use the existing ones | `set(string)` | `null` | no |
 | id\_length\_limit | Limit `id` to this many characters.<br>Set to `0` for unlimited length.<br>Set to `null` for default, which is `0`.<br>Does not affect `id_full`. | `number` | `null` | no |
 | label\_order | The naming order of the id output and Name tag.<br>Defaults to ["namespace", "environment", "stage", "name", "attributes"].<br>You can omit any of the 5 elements, but at least one must be present. | `list(string)` | `null` | no |
 | name | Solution name, e.g. 'app' or 'jenkins' | `string` | `null` | no |

@@ -11,6 +11,12 @@ module "transit_gateway" {
   ram_resource_share_enabled = true
   config                     = null
 
+  existing_transit_gateway_vpc_attachment_ids = [
+    module.transit_gateway_vpc_attachments_and_subnet_routes_prod.transit_gateway_vpc_attachment_ids["prod"],
+    module.transit_gateway_vpc_attachments_and_subnet_routes_staging.transit_gateway_vpc_attachment_ids["staging"],
+    module.transit_gateway_vpc_attachments_and_subnet_routes_dev.transit_gateway_vpc_attachment_ids["dev"]
+  ]
+
   context = module.this.context
 
   providers = {

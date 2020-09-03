@@ -28,12 +28,32 @@ output "transit_gateway_vpc_attachment_id_dev" {
   description = "Dev Transit Gateway VPC attachment ID"
 }
 
-output "transit_gateway_route_ids" {
-  value       = module.transit_gateway.transit_gateway_route_ids
-  description = "Transit Gateway route identifiers combined with destinations"
+output "transit_gateway_route_ids_prod" {
+  value       = module.transit_gateway.transit_gateway_route_ids["prod"]
+  description = "Prod Transit Gateway route identifiers combined with destinations"
 }
 
-output "subnet_route_ids" {
-  value       = module.transit_gateway.subnet_route_ids
-  description = "Subnet route identifiers combined with destinations"
+output "transit_gateway_route_ids_staging" {
+  value       = module.transit_gateway.transit_gateway_route_ids["staging"]
+  description = "Staging Transit Gateway route identifiers combined with destinations"
+}
+
+output "transit_gateway_route_ids_dev" {
+  value       = module.transit_gateway.transit_gateway_route_ids["dev"]
+  description = "Dev Transit Gateway route identifiers combined with destinations"
+}
+
+output "subnet_route_ids_prod" {
+  value       = module.transit_gateway.subnet_route_ids["prod"]
+  description = "Prod subnet route identifiers combined with destinations"
+}
+
+output "subnet_route_ids_staging" {
+  value       = module.transit_gateway.subnet_route_ids["staging"]
+  description = "Staging subnet route identifiers combined with destinations"
+}
+
+output "subnet_route_ids_dev" {
+  value       = module.transit_gateway.subnet_route_ids["dev"]
+  description = "Dev subnet route identifiers combined with destinations"
 }
