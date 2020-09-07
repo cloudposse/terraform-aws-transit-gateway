@@ -9,10 +9,11 @@
 module "transit_gateway" {
   source = "../../"
 
-  create_transit_gateway                = true
-  create_transit_gateway_route_table    = true
-  ram_resource_share_enabled            = true
-  create_transit_gateway_vpc_attachment = false
+  create_transit_gateway                                         = true
+  create_transit_gateway_route_table                             = true
+  ram_resource_share_enabled                                     = true
+  create_transit_gateway_vpc_attachment                          = false
+  create_transit_gateway_route_table_association_and_propagation = true
 
   config = {
     prod = {
@@ -75,11 +76,12 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_prod" {
   source = "../../"
 
   # `prod` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
-  create_transit_gateway                  = false
-  create_transit_gateway_route_table      = false
-  existing_transit_gateway_id             = module.transit_gateway.transit_gateway_id
-  existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
-  create_transit_gateway_vpc_attachment   = true
+  create_transit_gateway                                         = false
+  create_transit_gateway_route_table                             = false
+  existing_transit_gateway_id                                    = module.transit_gateway.transit_gateway_id
+  existing_transit_gateway_route_table_id                        = module.transit_gateway.transit_gateway_route_table_id
+  create_transit_gateway_vpc_attachment                          = true
+  create_transit_gateway_route_table_association_and_propagation = false
 
   config = {
     prod = {
@@ -108,11 +110,12 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_staging" {
   source = "../../"
 
   # `staging` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
-  create_transit_gateway                  = false
-  create_transit_gateway_route_table      = false
-  existing_transit_gateway_id             = module.transit_gateway.transit_gateway_id
-  existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
-  create_transit_gateway_vpc_attachment   = true
+  create_transit_gateway                                         = false
+  create_transit_gateway_route_table                             = false
+  existing_transit_gateway_id                                    = module.transit_gateway.transit_gateway_id
+  existing_transit_gateway_route_table_id                        = module.transit_gateway.transit_gateway_route_table_id
+  create_transit_gateway_vpc_attachment                          = true
+  create_transit_gateway_route_table_association_and_propagation = false
 
   config = {
     staging = {
@@ -140,11 +143,12 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_dev" {
   source = "../../"
 
   # `dev` account can access the Transit Gateway in the `network` account since we shared the Transit Gateway with the Organization using Resource Access Manager
-  create_transit_gateway                  = false
-  create_transit_gateway_route_table      = false
-  existing_transit_gateway_id             = module.transit_gateway.transit_gateway_id
-  existing_transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
-  create_transit_gateway_vpc_attachment   = true
+  create_transit_gateway                                         = false
+  create_transit_gateway_route_table                             = false
+  existing_transit_gateway_id                                    = module.transit_gateway.transit_gateway_id
+  existing_transit_gateway_route_table_id                        = module.transit_gateway.transit_gateway_route_table_id
+  create_transit_gateway_vpc_attachment                          = true
+  create_transit_gateway_route_table_association_and_propagation = false
 
   config = {
     dev = {
