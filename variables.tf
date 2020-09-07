@@ -88,3 +88,21 @@ variable "existing_transit_gateway_route_table_id" {
   default     = null
   description = "Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but instead will use the existing one"
 }
+
+variable "create_transit_gateway" {
+  type        = bool
+  default     = true
+  description = "Whether to create a Transit Gateway. If set to `false`, an existing Transit Gateway ID must be provided in the variable `existing_transit_gateway_id`"
+}
+
+variable "create_transit_gateway_route_table" {
+  type        = bool
+  default     = true
+  description = "Whether to create a Transit Gateway Route Table. If set to `false`, an existing Transit Gateway Route Table ID must be provided in the variable `existing_transit_gateway_route_table_id`"
+}
+
+variable "create_transit_gateway_vpc_attachment" {
+  type        = bool
+  default     = true
+  description = "Whether to create Transit Gateway VPC Attachments"
+}
