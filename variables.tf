@@ -60,12 +60,13 @@ variable "vpc_attachment_ipv6_support" {
 
 variable "config" {
   type = map(object({
-    vpc_id                 = string
-    vpc_cidr               = string
-    subnet_ids             = set(string)
-    subnet_route_table_ids = set(string)
-    route_to               = set(string)
-    route_to_cidr_blocks   = set(string)
+    vpc_id                            = string
+    vpc_cidr                          = string
+    subnet_ids                        = set(string)
+    subnet_route_table_ids            = set(string)
+    route_to                          = set(string)
+    route_to_cidr_blocks              = set(string)
+    transit_gateway_vpc_attachment_id = string
     static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
@@ -86,10 +87,4 @@ variable "existing_transit_gateway_route_table_id" {
   type        = string
   default     = null
   description = "Existing Transit Gateway Route Table ID. If provided, the module will not create a Transit Gateway Route Table but instead will use the existing one"
-}
-
-variable "existing_transit_gateway_vpc_attachment_ids" {
-  type        = set(string)
-  default     = null
-  description = "Existing Transit Gateway VPC Attachment IDs. If provided, the module will not create VPC Attachments but instead will use the existing ones"
 }

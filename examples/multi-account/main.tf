@@ -1,4 +1,5 @@
-# Create the Transit Gateway in the `network` account. Enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM)
+# Create the Transit Gateway, route table associations/propagations, and static TGW routes in the `network` account.
+# Enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM)
 # If you would like to share resources with your organization or organizational units,
 # then you must use the AWS RAM console or CLI command to enable sharing with AWS Organizations.
 # When you share resources within your organization,
@@ -9,13 +10,39 @@ module "transit_gateway" {
   source = "../../"
 
   ram_resource_share_enabled = true
-  config                     = null
 
-  existing_transit_gateway_vpc_attachment_ids = [
-    module.transit_gateway_vpc_attachments_and_subnet_routes_prod.transit_gateway_vpc_attachment_ids["prod"],
-    module.transit_gateway_vpc_attachments_and_subnet_routes_staging.transit_gateway_vpc_attachment_ids["staging"],
-    module.transit_gateway_vpc_attachments_and_subnet_routes_dev.transit_gateway_vpc_attachment_ids["dev"]
-  ]
+  config = {
+    prod = {
+      vpc_id                            = null
+      vpc_cidr                          = null
+      subnet_ids                        = null
+      subnet_route_table_ids            = null
+      route_to                          = null
+      route_to_cidr_blocks              = null
+      static_routes                     = null
+      transit_gateway_vpc_attachment_id = module.transit_gateway_vpc_attachments_and_subnet_routes_prod.transit_gateway_vpc_attachment_ids["prod"]
+    },
+    staging = {
+      vpc_id                            = null
+      vpc_cidr                          = null
+      subnet_ids                        = null
+      subnet_route_table_ids            = null
+      route_to                          = null
+      route_to_cidr_blocks              = null
+      static_routes                     = null
+      transit_gateway_vpc_attachment_id = module.transit_gateway_vpc_attachments_and_subnet_routes_staging.transit_gateway_vpc_attachment_ids["staging"]
+    },
+    dev = {
+      vpc_id                            = null
+      vpc_cidr                          = null
+      subnet_ids                        = null
+      subnet_route_table_ids            = null
+      route_to                          = null
+      route_to_cidr_blocks              = null
+      static_routes                     = null
+      transit_gateway_vpc_attachment_id = module.transit_gateway_vpc_attachments_and_subnet_routes_dev.transit_gateway_vpc_attachment_ids["dev"]
+    }
+  }
 
   context = module.this.context
 
@@ -43,7 +70,9 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_prod" {
       route_to               = null
       route_to_cidr_blocks = [
         module.vpc_staging.vpc_cidr_block,
-      module.vpc_dev.vpc_cidr_block]
+        module.vpc_dev.vpc_cidr_block
+      ]
+      transit_gateway_vpc_attachment_id = null
       static_routes = [
         {
           blackhole              = true
@@ -79,7 +108,9 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_staging" {
       subnet_route_table_ids = module.subnets_staging.private_route_table_ids
       route_to               = null
       route_to_cidr_blocks = [
-      module.vpc_dev.vpc_cidr_block]
+        module.vpc_dev.vpc_cidr_block
+      ]
+      transit_gateway_vpc_attachment_id = null
       static_routes = [
         {
           blackhole              = false
@@ -105,13 +136,14 @@ module "transit_gateway_vpc_attachments_and_subnet_routes_dev" {
 
   config = {
     dev = {
-      vpc_id                 = module.vpc_dev.vpc_id
-      vpc_cidr               = module.vpc_dev.vpc_cidr_block
-      subnet_ids             = module.subnets_dev.private_subnet_ids
-      subnet_route_table_ids = module.subnets_dev.private_route_table_ids
-      route_to               = null
-      route_to_cidr_blocks   = null
-      static_routes          = null
+      vpc_id                            = module.vpc_dev.vpc_id
+      vpc_cidr                          = module.vpc_dev.vpc_cidr_block
+      subnet_ids                        = module.subnets_dev.private_subnet_ids
+      subnet_route_table_ids            = module.subnets_dev.private_route_table_ids
+      route_to                          = null
+      route_to_cidr_blocks              = null
+      transit_gateway_vpc_attachment_id = null
+      static_routes                     = null
     }
   }
 

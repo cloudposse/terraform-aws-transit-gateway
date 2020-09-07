@@ -71,12 +71,13 @@ module "subnets_dev" {
 locals {
   transit_gateway_config = {
     prod = {
-      vpc_id                 = module.vpc_prod.vpc_id
-      vpc_cidr               = module.vpc_prod.vpc_cidr_block
-      subnet_ids             = module.subnets_prod.private_subnet_ids
-      subnet_route_table_ids = module.subnets_prod.private_route_table_ids
-      route_to               = ["staging", "dev"]
-      route_to_cidr_blocks   = null
+      vpc_id                            = module.vpc_prod.vpc_id
+      vpc_cidr                          = module.vpc_prod.vpc_cidr_block
+      subnet_ids                        = module.subnets_prod.private_subnet_ids
+      subnet_route_table_ids            = module.subnets_prod.private_route_table_ids
+      route_to                          = ["staging", "dev"]
+      route_to_cidr_blocks              = null
+      transit_gateway_vpc_attachment_id = null
       static_routes = [
         {
           blackhole              = true
@@ -90,12 +91,13 @@ locals {
     },
 
     staging = {
-      vpc_id                 = module.vpc_staging.vpc_id
-      vpc_cidr               = module.vpc_staging.vpc_cidr_block
-      subnet_ids             = module.subnets_staging.private_subnet_ids
-      subnet_route_table_ids = module.subnets_staging.private_route_table_ids
-      route_to               = null
-      route_to_cidr_blocks   = [module.vpc_dev.vpc_cidr_block]
+      vpc_id                            = module.vpc_staging.vpc_id
+      vpc_cidr                          = module.vpc_staging.vpc_cidr_block
+      subnet_ids                        = module.subnets_staging.private_subnet_ids
+      subnet_route_table_ids            = module.subnets_staging.private_route_table_ids
+      route_to                          = null
+      route_to_cidr_blocks              = [module.vpc_dev.vpc_cidr_block]
+      transit_gateway_vpc_attachment_id = null
       static_routes = [
         {
           blackhole              = false
@@ -105,13 +107,14 @@ locals {
     },
 
     dev = {
-      vpc_id                 = module.vpc_dev.vpc_id
-      vpc_cidr               = module.vpc_dev.vpc_cidr_block
-      subnet_ids             = module.subnets_dev.private_subnet_ids
-      subnet_route_table_ids = module.subnets_dev.private_route_table_ids
-      route_to               = null
-      route_to_cidr_blocks   = null
-      static_routes          = null
+      vpc_id                            = module.vpc_dev.vpc_id
+      vpc_cidr                          = module.vpc_dev.vpc_cidr_block
+      subnet_ids                        = module.subnets_dev.private_subnet_ids
+      subnet_route_table_ids            = module.subnets_dev.private_route_table_ids
+      route_to                          = null
+      route_to_cidr_blocks              = null
+      transit_gateway_vpc_attachment_id = null
+      static_routes                     = null
     }
   }
 }
