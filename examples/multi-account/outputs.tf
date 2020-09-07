@@ -44,16 +44,16 @@ output "transit_gateway_route_ids_dev" {
 }
 
 output "subnet_route_ids_prod" {
-  value       = try(module.transit_gateway.subnet_route_ids["prod"], {})
+  value       = try(module.transit_gateway_vpc_attachments_and_subnet_routes_prod.subnet_route_ids["prod"], {})
   description = "Prod subnet route identifiers combined with destinations"
 }
 
 output "subnet_route_ids_staging" {
-  value       = try(module.transit_gateway.subnet_route_ids["staging"], {})
+  value       = try(module.transit_gateway_vpc_attachments_and_subnet_routes_staging.subnet_route_ids["staging"], {})
   description = "Staging subnet route identifiers combined with destinations"
 }
 
 output "subnet_route_ids_dev" {
-  value       = try(module.transit_gateway.subnet_route_ids["dev"], {})
+  value       = try(module.transit_gateway_vpc_attachments_and_subnet_routes_dev.subnet_route_ids["dev"], {})
   description = "Dev subnet route identifiers combined with destinations"
 }
