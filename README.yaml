@@ -126,12 +126,14 @@ usage: |-
   locals {
     transit_gateway_config = {
       prod = {
-        vpc_id                 = module.vpc_prod.vpc_id
-        vpc_cidr               = module.vpc_prod.vpc_cidr_block
-        subnet_ids             = module.subnets_prod.private_subnet_ids
-        subnet_route_table_ids = module.subnets_prod.private_route_table_ids
-        route_to               = ["staging", "dev"]
-        route_to_cidr_blocks   = null
+        vpc_id                            = module.vpc_prod.vpc_id
+        vpc_cidr                          = module.vpc_prod.vpc_cidr_block
+        subnet_ids                        = module.subnets_prod.private_subnet_ids
+        subnet_route_table_ids            = module.subnets_prod.private_route_table_ids
+        route_to                          = ["staging", "dev"]
+        route_to_cidr_blocks              = null
+        transit_gateway_vpc_attachment_id = null
+
         static_routes = [
           {
             blackhole              = true
@@ -145,12 +147,14 @@ usage: |-
       },
 
       staging = {
-        vpc_id                 = module.vpc_staging.vpc_id
-        vpc_cidr               = module.vpc_staging.vpc_cidr_block
-        subnet_ids             = module.subnets_staging.private_subnet_ids
-        subnet_route_table_ids = module.subnets_staging.private_route_table_ids
-        route_to               = null
-        route_to_cidr_blocks   = [module.vpc_dev.vpc_cidr_block]
+        vpc_id                            = module.vpc_staging.vpc_id
+        vpc_cidr                          = module.vpc_staging.vpc_cidr_block
+        subnet_ids                        = module.subnets_staging.private_subnet_ids
+        subnet_route_table_ids            = module.subnets_staging.private_route_table_ids
+        route_to                          = null
+        route_to_cidr_blocks              = [module.vpc_dev.vpc_cidr_block]
+        transit_gateway_vpc_attachment_id = null
+
         static_routes = [
           {
             blackhole              = false
@@ -160,13 +164,14 @@ usage: |-
       },
 
       dev = {
-        vpc_id                 = module.vpc_dev.vpc_id
-        vpc_cidr               = module.vpc_dev.vpc_cidr_block
-        subnet_ids             = module.subnets_dev.private_subnet_ids
-        subnet_route_table_ids = module.subnets_dev.private_route_table_ids
-        route_to               = null
-        route_to_cidr_blocks   = null
-        static_routes          = null
+        vpc_id                            = module.vpc_dev.vpc_id
+        vpc_cidr                          = module.vpc_dev.vpc_cidr_block
+        subnet_ids                        = module.subnets_dev.private_subnet_ids
+        subnet_route_table_ids            = module.subnets_dev.private_route_table_ids
+        route_to                          = null
+        route_to_cidr_blocks              = null
+        transit_gateway_vpc_attachment_id = null
+        static_routes                     = null
       }
     }
   }
@@ -189,7 +194,7 @@ examples: |-
   Here are automated tests for the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS):
   - [`test`](test)
 
-  Here is an example of using this module in a multi-account environment (with the Transit Gateway in one AWS account and all the VPC attachments and routes in different AWS accounts:
+  Here is an example of using this module in a multi-account environment (with the Transit Gateway in one AWS account and all the VPC attachments and routes in different AWS accounts):
   - [`examples/multi-account`](examples/multi-account)
 
 # How to get started quickly
