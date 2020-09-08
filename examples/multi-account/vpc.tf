@@ -1,13 +1,13 @@
-provider "aws" {
-  region = var.region
-}
-
 module "vpc_prod" {
   source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.17.0"
   cidr_block = "172.16.0.0/16"
 
   attributes = ["prod"]
   context    = module.this.context
+
+  providers = {
+    aws = aws.prod
+  }
 }
 
 module "subnets_prod" {
@@ -22,6 +22,10 @@ module "subnets_prod" {
 
   attributes = ["prod"]
   context    = module.this.context
+
+  providers = {
+    aws = aws.prod
+  }
 }
 
 module "vpc_staging" {
@@ -30,6 +34,10 @@ module "vpc_staging" {
 
   attributes = ["staging"]
   context    = module.this.context
+
+  providers = {
+    aws = aws.staging
+  }
 }
 
 module "subnets_staging" {
@@ -44,6 +52,10 @@ module "subnets_staging" {
 
   attributes = ["staging"]
   context    = module.this.context
+
+  providers = {
+    aws = aws.staging
+  }
 }
 
 module "vpc_dev" {
@@ -52,6 +64,10 @@ module "vpc_dev" {
 
   attributes = ["dev"]
   context    = module.this.context
+
+  providers = {
+    aws = aws.dev
+  }
 }
 
 module "subnets_dev" {
@@ -66,64 +82,8 @@ module "subnets_dev" {
 
   attributes = ["dev"]
   context    = module.this.context
-}
 
-locals {
-  transit_gateway_config = {
-    prod = {
-      vpc_id                            = module.vpc_prod.vpc_id
-      vpc_cidr                          = module.vpc_prod.vpc_cidr_block
-      subnet_ids                        = module.subnets_prod.private_subnet_ids
-      subnet_route_table_ids            = module.subnets_prod.private_route_table_ids
-      route_to                          = ["staging", "dev"]
-      route_to_cidr_blocks              = null
-      transit_gateway_vpc_attachment_id = null
-      static_routes = [
-        {
-          blackhole              = true
-          destination_cidr_block = "0.0.0.0/0"
-        },
-        {
-          blackhole              = false
-          destination_cidr_block = "172.16.1.0/24"
-        }
-      ]
-    },
-
-    staging = {
-      vpc_id                            = module.vpc_staging.vpc_id
-      vpc_cidr                          = module.vpc_staging.vpc_cidr_block
-      subnet_ids                        = module.subnets_staging.private_subnet_ids
-      subnet_route_table_ids            = module.subnets_staging.private_route_table_ids
-      route_to                          = null
-      route_to_cidr_blocks              = [module.vpc_dev.vpc_cidr_block]
-      transit_gateway_vpc_attachment_id = null
-      static_routes = [
-        {
-          blackhole              = false
-          destination_cidr_block = "172.32.1.0/24"
-        }
-      ]
-    },
-
-    dev = {
-      vpc_id                            = module.vpc_dev.vpc_id
-      vpc_cidr                          = module.vpc_dev.vpc_cidr_block
-      subnet_ids                        = module.subnets_dev.private_subnet_ids
-      subnet_route_table_ids            = module.subnets_dev.private_route_table_ids
-      route_to                          = null
-      route_to_cidr_blocks              = null
-      transit_gateway_vpc_attachment_id = null
-      static_routes                     = null
-    }
+  providers = {
+    aws = aws.dev
   }
-}
-
-module "transit_gateway" {
-  source = "../../"
-
-  ram_resource_share_enabled = false
-  config                     = local.transit_gateway_config
-
-  context = module.this.context
 }

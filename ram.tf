@@ -1,4 +1,4 @@
-# Resource Access Manager 9RAM) share for the Transit Gateway
+# Resource Access Manager (RAM) share for the Transit Gateway
 # https://docs.aws.amazon.com/ram/latest/userguide/what-is.html
 resource "aws_ram_resource_share" "default" {
   count                     = var.ram_resource_share_enabled ? 1 : 0
@@ -14,7 +14,7 @@ data "aws_organizations_organization" "default" {
 
 resource "aws_ram_resource_association" "default" {
   count              = var.ram_resource_share_enabled ? 1 : 0
-  resource_arn       = aws_ec2_transit_gateway.default.arn
+  resource_arn       = try(aws_ec2_transit_gateway.default[0].arn, "")
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
 }
 
