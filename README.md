@@ -90,6 +90,14 @@ Each environment configuration contains the following fields:
     Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
   - `transit_gateway_vpc_attachment_id` - An existing Transit Gateway Attachment ID. If provided, the module will use it instead of creating a new one.
 
+You now have the option to have Terraform manage route table entries by key, whereas previously they were only managed by index. The advantage
+of managing them by key is that if a route table ID or destination CIDR changes, only that entry is affected, whereas when managed by index,
+all the entries after the first affected index may be destroyed and re-created at a different index. The reason this is left as an option,
+with the default being to manage the entries by index, is that if you are creating the VPC or subnets at the same time you are creating
+the Transit Gateway, then Terraform will not be able to generate the keys during the plan phase and the plan will fail with the error
+`The "for_each" value depends on resource attributes that cannot be determined until apply...`. We recommend setting `route_keys_enabled` to
+`true` unless you get this error, in which case you must leave it set to its default value of `false`.
+
 __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
 ## Usage
@@ -238,6 +246,7 @@ Available targets:
 | ram\_principal | The principal to associate with the resource share. Possible values are an AWS account ID, an Organization ARN, or an Organization Unit ARN. If this is not provided and `ram_resource_share_enabled` is set to `true`, the Organization ARN will be used | `string` | `null` | no |
 | ram\_resource\_share\_enabled | Whether to enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM) | `bool` | `false` | no |
 | regex\_replace\_chars | Regex to replace chars with empty string in `namespace`, `environment`, `stage` and `name`.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
+| route\_keys\_enabled | If true, Terraform will use keys to label routes, preventing unnecessary changes,<br>but this requires that the VPCs and subnets already exist before using this module.<br>If false, Terraform will use numbers to label routes, and a single change may<br>cascade to a long list of changes because the index or order has changed, but<br>this will work when the `true` setting generates the error `The "for_each" value depends on resource attributes...` | `bool` | `false` | no |
 | stage | Stage, e.g. 'prod', 'staging', 'dev', OR 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | tags | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
 | vpc\_attachment\_dns\_support | Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable` | `string` | `"enable"` | no |

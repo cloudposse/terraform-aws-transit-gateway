@@ -112,3 +112,15 @@ variable "create_transit_gateway_route_table_association_and_propagation" {
   default     = true
   description = "Whether to create Transit Gateway Route Table associations and propagations"
 }
+
+variable "route_keys_enabled" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    If true, Terraform will use keys to label routes, preventing unnecessary changes,
+    but this requires that the VPCs and subnets already exist before using this module.
+    If false, Terraform will use numbers to label routes, and a single change may
+    cascade to a long list of changes because the index or order has changed, but
+    this will work when the `true` setting generates the error `The "for_each" value depends on resource attributes...`
+    EOT
+}
