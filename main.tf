@@ -24,7 +24,7 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
   tags               = module.this.tags
 }
 
-# Need to find out of VPC is in same account as Transit Gateway.
+# Need to find out if VPC is in same account as Transit Gateway.
 # See resource "aws_ec2_transit_gateway_vpc_attachment" below.
 data "aws_ec2_transit_gateway" "this" {
   id = local.transit_gateway_id
