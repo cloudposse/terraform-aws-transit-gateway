@@ -28,8 +28,11 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   dns_support                                     = var.vpc_attachment_dns_support
   ipv6_support                                    = var.vpc_attachment_ipv6_support
   tags                                            = module.this.tags
-  transit_gateway_default_route_table_association = false
-  transit_gateway_default_route_table_propagation = false
+
+  # These cannot be configured with Resource Access Manager shared EC2 Transit Gateways
+  # See https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment
+  # transit_gateway_default_route_table_association = false
+  # transit_gateway_default_route_table_propagation = false
 }
 
 # Allow traffic from the VPC attachments to the Transit Gateway
