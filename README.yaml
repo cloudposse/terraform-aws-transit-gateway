@@ -115,6 +115,14 @@ introduction: |-
       Specify either `route_to` or `route_to_cidr_blocks`. `route_to_cidr_blocks` supersedes `route_to`.
     - `transit_gateway_vpc_attachment_id` - An existing Transit Gateway Attachment ID. If provided, the module will use it instead of creating a new one.
 
+  You now have the option to have Terraform manage route table entries by key, whereas previously they were only managed by index. The advantage
+  of managing them by key is that if a route table ID or destination CIDR changes, only that entry is affected, whereas when managed by index,
+  all the entries after the first affected index may be destroyed and re-created at a different index. The reason this is left as an option,
+  with the default being to manage the entries by index, is that if you are creating the VPC or subnets at the same time you are creating
+  the Transit Gateway, then Terraform will not be able to generate the keys during the plan phase and the plan will fail with the error
+  `The "for_each" value depends on resource attributes that cannot be determined until apply...`. We recommend setting `route_keys_enabled` to
+  `true` unless you get this error, in which case you must leave it set to its default value of `false`.
+
   __NOTE:__ This module requires Terraform 0.13 and newer since it uses [module expansion with `for_each`](https://www.hashicorp.com/blog/announcing-hashicorp-terraform-0-13/).
 
 

@@ -12,3 +12,8 @@ variable "destination_cidr_blocks" {
   type        = list(string)
   description = "Destination CIDR blocks"
 }
+
+variable "route_keys_enabled" {
+  type    = bool
+  default = false
+}
