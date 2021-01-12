@@ -185,7 +185,9 @@ usage: |-
   }
 
   module "transit_gateway" {
-    source = "git::https://github.com/cloudposse/terraform-aws-transit-gateway.git?ref=master"
+    source = "cloudposse/transit-gateway/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
 
     ram_resource_share_enabled = false
     config                     = local.transit_gateway_config
