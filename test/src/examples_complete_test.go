@@ -133,8 +133,8 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 	subnetRouteIds := terraform.OutputMap(t, terraformOptions, "subnet_route_ids")
 	transitGatewayRouteIds := terraform.OutputMap(t, terraformOptions, "transit_gateway_route_ids")
 
-	assert.Empty(t, transitGatewayArn)
-	assert.Empty(t, transitGatewayRouteTableId)
+	assert.Equal(t, "\"\"", transitGatewayArn)
+	assert.Equal(t, "\"\"", transitGatewayRouteTableId)
 	assert.Empty(t, transitGatewayVpcAttachmentIds)
 	assert.Empty(t, subnetRouteIds)
 	assert.Empty(t, transitGatewayRouteIds)
