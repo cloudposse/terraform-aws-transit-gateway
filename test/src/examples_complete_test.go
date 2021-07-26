@@ -18,6 +18,18 @@ func TestExamplesComplete(t *testing.T) {
 	randId := strconv.Itoa(rand.Intn(100000))
 	attributes := []string{randId}
 
+	terraformVpcOptions := &terraform.Options{
+		// The path to where our Terraform code is located
+		TerraformDir: "../../examples/complete",
+		Upgrade:      true,
+		// Variables to pass to our Terraform code using -var-file options
+		VarFiles: []string{"fixtures.us-east-2.tfvars"},
+		Vars: map[string]interface{}{
+			"attributes": attributes,
+		},
+		Targets: []string{"module.vpc_prod", "module.subnets_prod", "module.vpc_staging", "module.subnets_staging", "module.vpc_dev", "module.subnets_dev"},
+	}
+
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
 		TerraformDir: "../../examples/complete",
@@ -27,6 +39,7 @@ func TestExamplesComplete(t *testing.T) {
 		Vars: map[string]interface{}{
 			"attributes": attributes,
 		},
+		Targets: []string{"module.transit_gateway"},
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
@@ -38,7 +51,8 @@ func TestExamplesComplete(t *testing.T) {
 	}()
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
-	terraform.InitAndApply(t, terraformOptions)
+	terraform.InitAndApply(t, terraformVpcOptions)
+	terraform.Apply(t, terraformOptions)
 
 	// Run `terraform output` to get the value of an output variable
 	transitGatewayArn := terraform.Output(t, terraformOptions, "transit_gateway_arn")
