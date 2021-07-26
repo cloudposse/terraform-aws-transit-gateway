@@ -4,7 +4,9 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"math/rand"
+	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -42,8 +44,13 @@ func TestExamplesComplete(t *testing.T) {
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer func() {
 		terraformOptions.Targets = []string{"module.transit_gateway"}
-		terraform.Destroy(t, terraformOptions)
-		terraform.Destroy(t, terraformVpcOptions)
+		// Creating infrastructure per test takes minutes so optimise by optionally destroying the vpc/subnets dependencies - default is to destroy all
+		if len(strings.TrimSpace(os.Getenv("DESTROY_TGW_ONLY"))) > 0 {
+			terraform.Destroy(t, terraformOptions)
+		} else {
+			terraform.Destroy(t, terraformOptions)
+			terraform.Destroy(t, terraformVpcOptions)
+		}
 	}()
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
@@ -107,8 +114,13 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer func() {
 		terraformOptions.Targets = []string{"module.transit_gateway"}
-		terraform.Destroy(t, terraformOptions)
-		terraform.Destroy(t, terraformVpcOptions)
+		// Creating infrastructure per test takes minutes so optimise by optionally destroying the vpc/subnets dependencies - default is to destroy all
+		if len(strings.TrimSpace(os.Getenv("DESTROY_TGW_ONLY"))) > 0 {
+			terraform.Destroy(t, terraformOptions)
+		} else {
+			terraform.Destroy(t, terraformOptions)
+			terraform.Destroy(t, terraformVpcOptions)
+		}
 	}()
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
