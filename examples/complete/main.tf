@@ -8,7 +8,7 @@ module "vpc_prod" {
 
   cidr_block = "172.16.0.0/16"
 
-  enabled = true
+  enabled    = true
   attributes = ["prod"]
   context    = module.this.context
 }
@@ -25,7 +25,7 @@ module "subnets_prod" {
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
 
-  enabled = true
+  enabled    = true
   attributes = ["prod"]
   context    = module.this.context
 }
@@ -36,7 +36,7 @@ module "vpc_staging" {
 
   cidr_block = "172.32.0.0/16"
 
-  enabled = true
+  enabled    = true
   attributes = ["staging"]
   context    = module.this.context
 }
@@ -53,7 +53,7 @@ module "subnets_staging" {
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
 
-  enabled = true
+  enabled    = true
   attributes = ["staging"]
   context    = module.this.context
 }
@@ -64,7 +64,7 @@ module "vpc_dev" {
 
   cidr_block = "172.48.0.0/16"
 
-  enabled = true
+  enabled    = true
   attributes = ["dev"]
   context    = module.this.context
 }
@@ -81,7 +81,7 @@ module "subnets_dev" {
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
 
-  enabled = true
+  enabled    = true
   attributes = ["dev"]
   context    = module.this.context
 }
