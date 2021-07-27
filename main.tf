@@ -27,7 +27,7 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
 # Need to find out if VPC is in same account as Transit Gateway.
 # See resource "aws_ec2_transit_gateway_vpc_attachment" below.
 data "aws_ec2_transit_gateway" "this" {
-  count = local.transit_gateway_id != null ? 1 : 0
+  count = (module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)) ? 1 : 0
   id    = local.transit_gateway_id
 }
 
