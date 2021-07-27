@@ -21,10 +21,19 @@ resource "aws_ec2_transit_gateway" "default" {
   tags                            = module.this.tags
 }
 
+module "routes_label" {
+  source  = "cloudposse/label/null"
+  version = "0.24.1"
+
+  attributes = ["rt"]
+
+  context = module.this.context
+}
+
 resource "aws_ec2_transit_gateway_route_table" "default" {
   count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
   transit_gateway_id = local.transit_gateway_id
-  tags               = module.this.tags
+  tags = module.routes_label.tags
 }
 
 # Need to find out if VPC is in same account as Transit Gateway.
@@ -39,6 +48,15 @@ data "aws_vpc" "default" {
   id       = each.value["vpc_id"]
 }
 
+module "vpc_attach_label" {
+  source  = "cloudposse/label/null"
+  version = "0.24.1"
+
+  attributes = ["att"]
+
+  context = module.this.context
+}
+
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each           = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
   transit_gateway_id = local.transit_gateway_id
@@ -46,7 +64,12 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   subnet_ids         = each.value["subnet_ids"]
   dns_support        = var.vpc_attachment_dns_support
   ipv6_support       = var.vpc_attachment_ipv6_support
-  tags               = module.this.tags
+  tags = merge(
+    module.vpc_attach_label.tags,
+    {
+      "Name" = format("%s%s%s", module.vpc_attach_label.id, module.vpc_attach_label.delimiter, each.key)
+    }
+  )
 
   # transit_gateway_default_route_table_association and transit_gateway_default_route_table_propagation
   # must be set to `false` if the VPC is in the same account as the Transit Gateway, and `null` otherwise
