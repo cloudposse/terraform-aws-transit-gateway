@@ -13,9 +13,6 @@ import (
 
 // Test the Terraform module in examples/complete using Terratest.
 func TestExamplesComplete(t *testing.T) {
-	// Init phase module download fails when run in parallel
-	//t.Parallel()
-
 	rand.Seed(time.Now().UnixNano())
 
 	randId := strconv.Itoa(rand.Intn(100000))
@@ -84,9 +81,6 @@ func TestExamplesComplete(t *testing.T) {
 }
 
 func TestExamplesCompleteDisabledModule(t *testing.T) {
-	// Init phase module download fails when run in parallel
-	//t.Parallel()
-
 	rand.Seed(time.Now().UnixNano())
 
 	randId := strconv.Itoa(rand.Intn(100000))
