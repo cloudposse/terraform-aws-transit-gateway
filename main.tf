@@ -79,6 +79,8 @@ module "transit_gateway_route" {
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
   route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
+
+  depends_on = [aws_ec2_transit_gateway_vpc_attachment.default, aws_ec2_transit_gateway_route_table.default]
 }
 
 # Create routes in the subnets' route tables to route traffic from subnets to the Transit Gateway VPC attachments
@@ -90,4 +92,6 @@ module "subnet_route" {
   route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
   destination_cidr_blocks = each.value["route_to_cidr_blocks"] != null ? each.value["route_to_cidr_blocks"] : ([for i in setintersection(keys(var.config), (each.value["route_to"] != null ? each.value["route_to"] : [])) : var.config[i]["vpc_cidr"]])
   route_keys_enabled      = var.route_keys_enabled
+
+  depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, aws_ec2_transit_gateway_vpc_attachment.default]
 }
