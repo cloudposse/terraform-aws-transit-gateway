@@ -14,10 +14,10 @@ variable "ram_resource_share_enabled" {
   description = "Whether to enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM)"
 }
 
-variable "ram_principal" {
-  type        = string
+variable "ram_principals" {
+  type        = list(string)
   default     = null
-  description = "The principal to associate with the resource share. Possible values are an AWS account ID, an Organization ARN, or an Organization Unit ARN. If this is not provided and `ram_resource_share_enabled` is set to `true`, the Organization ARN will be used"
+  description = "The list of principal to associate with the resource share. Possible values are an AWS account ID, an Organization ARN, or an Organization Unit ARN. If this is not provided and `ram_resource_share_enabled` is set to `true`, the Organization ARN will be used"
 }
 
 variable "auto_accept_shared_attachments" {

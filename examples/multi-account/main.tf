@@ -1,6 +1,6 @@
 # Create the Transit Gateway, route table associations/propagations, and static TGW routes in the `network` account.
 # Enable sharing the Transit Gateway with the Organization using Resource Access Manager (RAM).
-# If you would like to share resources with your organization or organizational units,
+# If you would like to share resources with your organization, organizational units or accounts,
 # then you must use the AWS RAM console or CLI command to enable sharing with AWS Organizations.
 # When you share resources within your organization,
 # AWS RAM does not send invitations to principals. Principals in your organization get access to shared resources without exchanging invitations.
@@ -10,6 +10,9 @@ module "transit_gateway" {
   source = "../../"
 
   ram_resource_share_enabled = true
+  # See note above. If you have RAM enabled in your AWS Organization, you can share the TGW with an Organization, OU or individual account
+  # See the definition of principal at https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ram_principal_association#argument-reference
+  ram_principals = var.ram_principals
 
   create_transit_gateway                                         = true
   create_transit_gateway_route_table                             = true

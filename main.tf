@@ -33,7 +33,7 @@ module "routes_label" {
 resource "aws_ec2_transit_gateway_route_table" "default" {
   count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
   transit_gateway_id = local.transit_gateway_id
-  tags = module.routes_label.tags
+  tags               = module.routes_label.tags
 }
 
 # Need to find out if VPC is in same account as Transit Gateway.

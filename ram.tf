@@ -1,3 +1,7 @@
+locals {
+  ram_principals = var.ram_resource_share_enabled ? toset(coalesce(var.ram_principals, [try(data.aws_organizations_organization.default[0].arn, "")])) : toset([])
+}
+
 # Resource Access Manager (RAM) share for the Transit Gateway
 # https://docs.aws.amazon.com/ram/latest/userguide/what-is.html
 resource "aws_ram_resource_share" "default" {
@@ -9,7 +13,7 @@ resource "aws_ram_resource_share" "default" {
 
 # Share the Transit Gateway with the Organization if RAM principal was not provided
 data "aws_organizations_organization" "default" {
-  count = var.ram_resource_share_enabled && (var.ram_principal == null || var.ram_principal == "") ? 1 : 0
+  count = var.ram_resource_share_enabled && length(coalesce(var.ram_principals, [])) == 0 ? 1 : 0
 }
 
 resource "aws_ram_resource_association" "default" {
@@ -19,7 +23,8 @@ resource "aws_ram_resource_association" "default" {
 }
 
 resource "aws_ram_principal_association" "default" {
-  count              = var.ram_resource_share_enabled ? 1 : 0
-  principal          = try(coalesce(var.ram_principal, data.aws_organizations_organization.default[0].arn), "")
+  for_each = local.ram_principals
+
+  principal          = each.value
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
 }
