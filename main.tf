@@ -5,6 +5,9 @@ locals {
   transit_gateway_route_table_id = var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "" ? var.existing_transit_gateway_route_table_id : (
     module.this.enabled && var.create_transit_gateway_route_table ? aws_ec2_transit_gateway_route_table.default[0].id : null
   )
+  # NOTE: This is the same logic as local.transit_gateway_id but we cannot reuse that local in the data source or
+  # we get the dreaded error: "count" value depends on resource attributes
+  lookup_transit_gateway = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)
 }
 
 resource "aws_ec2_transit_gateway" "default" {
@@ -27,7 +30,7 @@ resource "aws_ec2_transit_gateway_route_table" "default" {
 # Need to find out if VPC is in same account as Transit Gateway.
 # See resource "aws_ec2_transit_gateway_vpc_attachment" below.
 data "aws_ec2_transit_gateway" "this" {
-  count = (module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)) ? 1 : 0
+  count = local.lookup_transit_gateway ? 1 : 0
   id    = local.transit_gateway_id
 }
 
