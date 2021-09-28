@@ -251,9 +251,11 @@ Available targets:
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_routes_label"></a> [routes\_label](#module\_routes\_label) | cloudposse/label/null | 0.24.1 |
 | <a name="module_subnet_route"></a> [subnet\_route](#module\_subnet\_route) | ./modules/subnet_route | n/a |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 | <a name="module_transit_gateway_route"></a> [transit\_gateway\_route](#module\_transit\_gateway\_route) | ./modules/transit_gateway_route | n/a |
+| <a name="module_vpc_attach_label"></a> [vpc\_attach\_label](#module\_vpc\_attach\_label) | cloudposse/label/null | 0.24.1 |
 
 ## Resources
 
