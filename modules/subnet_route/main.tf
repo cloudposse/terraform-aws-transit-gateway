@@ -9,6 +9,10 @@ resource "aws_route" "keys" {
   transit_gateway_id     = var.transit_gateway_id
   route_table_id         = each.value[0]
   destination_cidr_block = each.value[1]
+
+  timeouts {
+    create = "5m"
+  }
 }
 
 resource "aws_route" "count" {
@@ -16,4 +20,8 @@ resource "aws_route" "count" {
   transit_gateway_id     = var.transit_gateway_id
   route_table_id         = local.route_config_list[count.index][0]
   destination_cidr_block = local.route_config_list[count.index][1]
+
+  timeouts {
+    create = "5m"
+  }
 }
