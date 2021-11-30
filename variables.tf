@@ -46,6 +46,12 @@ variable "allow_external_principals" {
   description = "Indicates whether principals outside your organization can be associated with a resource share"
 }
 
+variable "vpc_attachment_appliance_mode_support" {
+  type        = string
+  default     = "disable"
+  description = "Whether Appliance Mode support is enabled. If enabled, a traffic flow between a source and destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable`, `enable`"
+}
+
 variable "vpc_attachment_dns_support" {
   type        = string
   default     = "enable"

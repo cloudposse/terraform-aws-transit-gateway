@@ -40,13 +40,14 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
-  for_each           = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
-  transit_gateway_id = local.transit_gateway_id
-  vpc_id             = each.value["vpc_id"]
-  subnet_ids         = each.value["subnet_ids"]
-  dns_support        = var.vpc_attachment_dns_support
-  ipv6_support       = var.vpc_attachment_ipv6_support
-  tags               = module.this.tags
+  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  transit_gateway_id     = local.transit_gateway_id
+  vpc_id                 = each.value["vpc_id"]
+  subnet_ids             = each.value["subnet_ids"]
+  appliance_mode_support = var.appliance_mode_support
+  dns_support            = var.vpc_attachment_dns_support
+  ipv6_support           = var.vpc_attachment_ipv6_support
+  tags                   = module.this.tags
 
   # transit_gateway_default_route_table_association and transit_gateway_default_route_table_propagation
   # must be set to `false` if the VPC is in the same account as the Transit Gateway, and `null` otherwise
