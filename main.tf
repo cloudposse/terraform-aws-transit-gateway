@@ -44,7 +44,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   transit_gateway_id     = local.transit_gateway_id
   vpc_id                 = each.value["vpc_id"]
   subnet_ids             = each.value["subnet_ids"]
-  appliance_mode_support = var.appliance_mode_support
+  appliance_mode_support = var.vpc_attachment_appliance_mode_support
   dns_support            = var.vpc_attachment_dns_support
   ipv6_support           = var.vpc_attachment_ipv6_support
   tags                   = module.this.tags
