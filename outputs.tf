@@ -37,3 +37,8 @@ output "subnet_route_ids" {
   value       = try({ for i, o in module.subnet_route : i => o["subnet_route_ids"] }, {})
   description = "Subnet route identifiers combined with destinations"
 }
+
+output "ram_resource_share_id" {
+  value       = try(aws_ram_resource_share.default[0].id, "")
+  description = "RAM resource share ID"
+}
