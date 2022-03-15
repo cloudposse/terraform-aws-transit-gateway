@@ -1,8 +1,9 @@
 locals {
-  ram_principals_provided = var.ram_principal != null || var.ram_principals != []
+  ram_principals_provided = var.ram_principal != null || length(var.ram_principals) > 0
   ram_principals = var.ram_resource_share_enabled ? toset(
     local.ram_principals_provided ? concat(
-      [var.ram_principal], var.ram_principals
+      var.ram_principal == null ? [] : [var.ram_principal],
+      var.ram_principals,
       ) : [
       data.aws_organizations_organization.default[0].arn
     ]
@@ -30,7 +31,7 @@ resource "aws_ram_resource_association" "default" {
 }
 
 resource "aws_ram_principal_association" "default" {
-  count              = var.ram_resource_share_enabled ? length(local.ram_principals) : 0
+  for_each           = local.ram_principals
   principal          = each.value
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
 }
