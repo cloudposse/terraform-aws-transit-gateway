@@ -1,13 +1,13 @@
 locals {
   ram_principals_provided = var.ram_principal != null || length(var.ram_principals) > 0
-  ram_principals = var.ram_resource_share_enabled ? toset(
+  ram_principals = toset(var.ram_resource_share_enabled ? toset(
     local.ram_principals_provided ? concat(
       var.ram_principal == null ? [] : [var.ram_principal],
       var.ram_principals,
       ) : [
       data.aws_organizations_organization.default[0].arn
     ]
-  ) : []
+  ) : [])
 }
 
 # Resource Access Manager (RAM) share for the Transit Gateway
