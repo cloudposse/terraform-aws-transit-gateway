@@ -146,3 +146,13 @@ variable "route_keys_enabled" {
     this will work when the `true` setting generates the error `The "for_each" value depends on resource attributes...`
     EOT
 }
+
+variable "transit_gateway_cidr_blocks" {
+  type        = list(string)
+  default     = null
+  description = <<-EOT
+    The list of associated CIDR blocks. It can contain up to 1 IPv4 CIDR block
+    of size up to /24 and up to one IPv6 CIDR block of size up to /64. The IPv4
+    block must not be from range 169.254.0.0/16.
+  EOT
+}
