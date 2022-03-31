@@ -7,7 +7,12 @@ variable "ram_resource_share_enabled" {
 variable "ram_principal" {
   type        = string
   default     = null
-  description = "DEPRECATED, please use ram_principals instead."
+  description = <<-EOT
+    DEPRECATED, please use ram_principals instead.
+
+    The principal to associate with the resource share. Possible values are an
+    AWS account ID, an Organization ARN, or an Organization Unit ARN.
+  EOT
 }
 
 variable "ram_principals" {
