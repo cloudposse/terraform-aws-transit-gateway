@@ -161,3 +161,9 @@ variable "transit_gateway_cidr_blocks" {
     block must not be from range 169.254.0.0/16.
   EOT
 }
+
+variable "transit_gateway_description" {
+  type        = string
+  default     = ""
+  description = "Transit Gateway description. If not provided, one will be automatically generated."
+}
