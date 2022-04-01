@@ -7,7 +7,28 @@ variable "ram_resource_share_enabled" {
 variable "ram_principal" {
   type        = string
   default     = null
-  description = "The principal to associate with the resource share. Possible values are an AWS account ID, an Organization ARN, or an Organization Unit ARN. If this is not provided and `ram_resource_share_enabled` is set to `true`, the Organization ARN will be used"
+  description = <<-EOT
+    DEPRECATED, please use ram_principals instead.
+
+    The principal to associate with the resource share. Possible values are an
+    AWS account ID, an Organization ARN, or an Organization Unit ARN.
+  EOT
+}
+
+variable "ram_principals" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    A list of principals to associate with the resource share. Possible values
+    are:
+
+    * AWS account ID
+    * Organization ARN
+    * Organization Unit ARN
+
+    If this (and var.ram_principal) is not provided and
+    `ram_resource_share_enabled` is `true`, the Organization ARN will be used.
+  EOT
 }
 
 variable "auto_accept_shared_attachments" {
