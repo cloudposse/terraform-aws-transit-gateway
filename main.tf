@@ -53,7 +53,12 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   appliance_mode_support = var.vpc_attachment_appliance_mode_support
   dns_support            = var.vpc_attachment_dns_support
   ipv6_support           = var.vpc_attachment_ipv6_support
-  tags                   = module.this.tags
+  tags                   = merge(
+    module.this.tags,
+    {
+      "Name" = "${module.this.id}-${each.key}-vpc-attachment"
+    },
+  )
 
   # transit_gateway_default_route_table_association and transit_gateway_default_route_table_propagation
   # must be set to `false` if the VPC is in the same account as the Transit Gateway, and `null` otherwise
