@@ -8,8 +8,11 @@ output "transit_gateway_id" {
   description = "Transit Gateway ID"
 }
 
-output "transit_gateway_route_table_id" {
-  value       = try(aws_ec2_transit_gateway_route_table.default[0].id, "")
+output "transit_gateway_route_table_ids" {
+  value = {
+    inspection = try(aws_ec2_transit_gateway_route_table.default[0].id, "")
+    transit    = try(aws_ec2_transit_gateway_route_table.transit[0].id, "")
+  }
   description = "Transit Gateway route table ID"
 }
 

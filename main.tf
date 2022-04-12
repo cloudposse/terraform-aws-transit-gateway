@@ -25,10 +25,10 @@ resource "aws_ec2_transit_gateway" "default" {
 resource "aws_ec2_transit_gateway_route_table" "default" {
   count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
   transit_gateway_id = local.transit_gateway_id
-  tags = var.transit_gateway_route_table_name_override != null ? merge(
+  tags = var.transit_gateway_inspection_route_table_name_override != null ? merge(
     module.this.tags,
     {
-      "Name" = "${var.transit_gateway_route_table_name_override}"
+      "Name" = "${var.transit_gateway_inspection_route_table_name_override}"
     },
   ) : module.this.tags
 }
@@ -53,7 +53,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   appliance_mode_support = var.vpc_attachment_appliance_mode_support
   dns_support            = var.vpc_attachment_dns_support
   ipv6_support           = var.vpc_attachment_ipv6_support
-  tags                   = merge(
+  tags = merge(
     module.this.tags,
     {
       "Name" = "${module.this.id}-${each.key}-vpc-attachment"
@@ -71,7 +71,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
 
 # Allow traffic from the VPC attachments to the Transit Gateway
 resource "aws_ec2_transit_gateway_route_table_association" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_inspection_route_table_association && var.config != null ? { for k, v in var.config : k => v if v.attach_to_transit_route_table == false } : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -79,7 +79,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "default" {
 # Allow traffic from the Transit Gateway to the VPC attachments
 # Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_inspection_route_table_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_transit_route_table == false } : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -90,10 +90,10 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
 # https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html
 module "transit_gateway_route" {
   source                         = "./modules/transit_gateway_route"
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_inspection_route_table_static_route && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
-  route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
+  route_config                   = each.value["inspection_static_routes"] != null ? each.value["inspection_static_routes"] : []
 
   depends_on = [aws_ec2_transit_gateway_vpc_attachment.default, aws_ec2_transit_gateway_route_table.default]
 }
@@ -102,7 +102,7 @@ module "transit_gateway_route" {
 # Only route to VPCs of the environments defined in `route_to` attribute
 module "subnet_route" {
   source                  = "./modules/subnet_route"
-  for_each                = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
+  for_each                = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? { for k, v in var.config : k => v if v.attach_to_transit_route_table == false } : {}
   transit_gateway_id      = local.transit_gateway_id
   route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
   destination_cidr_blocks = each.value["route_to_cidr_blocks"] != null ? each.value["route_to_cidr_blocks"] : ([for i in setintersection(keys(var.config), (each.value["route_to"] != null ? each.value["route_to"] : [])) : var.config[i]["vpc_cidr"]])
@@ -110,3 +110,17 @@ module "subnet_route" {
 
   depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, aws_ec2_transit_gateway_vpc_attachment.default]
 }
+
+# Create routes in the subnets' route tables to route traffic from subnets to the Transit Gateway VPC attachments
+# These can set to 
+module "extra_subnet_route" {
+  source                  = "./modules/subnet_route"
+  for_each                = module.this.enabled && var.subnet_route_to_transit_gateway != null ? var.subnet_route_to_transit_gateway : {}
+  transit_gateway_id      = local.transit_gateway_id
+  route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
+  destination_cidr_blocks = each.value["cidr_blocks"] != null ? each.value["cidr_blocks"] : []
+  route_keys_enabled      = var.route_keys_enabled
+
+  depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, aws_ec2_transit_gateway_vpc_attachment.default]
+}
+

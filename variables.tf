@@ -94,8 +94,12 @@ variable "config" {
     route_to                          = set(string)
     route_to_cidr_blocks              = set(string)
     transit_gateway_vpc_attachment_id = string
-    attach_to_additional_only         = bool
-    static_routes = set(object({
+    attach_to_transit_route_table     = bool
+    inspection_static_routes = set(object({
+      blackhole              = bool
+      destination_cidr_block = string
+    }))
+    transit_static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
     }))
@@ -103,7 +107,7 @@ variable "config" {
 
   description = <<-EOT
   Configuration for VPC attachments, Transit Gateway routes, and subnet routes
-  Attribute `attach_to_additional_only` means this config will only attach to additional tgw-rt
+  Attribute `attach_to_transit_route_table` means this config will attach to global tgw-rt, otherwise will attach to inspection tgw-rt
   EOT
   default     = null
 }
@@ -138,16 +142,40 @@ variable "create_transit_gateway_vpc_attachment" {
   description = "Whether to create Transit Gateway VPC Attachments"
 }
 
-variable "create_transit_gateway_route_table_association_and_propagation" {
+variable "create_transit_gateway_inspection_route_table_association" {
   type        = bool
   default     = true
-  description = "Whether to create Transit Gateway Route Table associations and propagations"
+  description = "Whether to create Transit Gateway Route Table associations"
 }
 
-variable "create_additional_transit_gateway_route_table_association_and_propagation" {
+variable "create_transit_gateway_inspection_route_table_propagation" {
   type        = bool
   default     = true
-  description = "Whether to create Additiontal Transit Gateway Route Table associations and propagations"
+  description = "Whether to create Transit Gateway Route Table propagations"
+}
+
+variable "create_transit_gateway_inspection_route_table_static_route" {
+  type        = bool
+  default     = true
+  description = "Whether to create custom static route in Transit Gateway Route Table"
+}
+
+variable "create_transit_gateway_transit_route_table_association" {
+  type        = bool
+  default     = true
+  description = "Whether to create Additiontal Transit Gateway Route Table associations"
+}
+
+variable "create_transit_gateway_transit_route_table_propagation" {
+  type        = bool
+  default     = true
+  description = "Whether to create Additiontal Transit Gateway Route Table propagations"
+}
+
+variable "create_transit_gateway_transit_route_table_static_route" {
+  type        = bool
+  default     = true
+  description = "Whether to create custom static route in Transit Gateway Global Route Table"
 }
 
 variable "route_keys_enabled" {
@@ -178,14 +206,24 @@ variable "transit_gateway_description" {
   description = "Transit Gateway description. If not provided, one will be automatically generated."
 }
 
-variable "transit_gateway_route_table_name_override" {
+variable "transit_gateway_inspection_route_table_name_override" {
   type        = string
   default     = null
   description = "Transit Gateway name override. If not provided, same name as Transit Gateway will be used."
 }
 
-variable "addtional_transit_gateway_route_table" {
+variable "transit_gateway_transit_route_table_name_override" {
   type        = string
   default     = null
   description = "Add an additional Transit Gateway, and value will be the name of this tgw."
+}
+
+variable "subnet_route_to_transit_gateway" {
+  type = map(object({
+    subnet_route_table_ids = set(string)
+    cidr_blocks            = set(string)
+  }))
+
+  description = "Block for adding routes to the selected subenets to this Transit Gateway"
+  default     = null
 }
