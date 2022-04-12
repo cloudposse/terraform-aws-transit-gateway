@@ -25,7 +25,12 @@ resource "aws_ec2_transit_gateway" "default" {
 resource "aws_ec2_transit_gateway_route_table" "default" {
   count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
   transit_gateway_id = local.transit_gateway_id
-  tags               = module.this.tags
+  tags = var.transit_gateway_route_table_name_override != null ? merge(
+    module.this.tags,
+    {
+      "Name" = "${var.transit_gateway_route_table_name_override}"
+    },
+  ) : module.this.tags
 }
 
 # Need to find out if VPC is in same account as Transit Gateway.
@@ -61,7 +66,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
 
 # Allow traffic from the VPC attachments to the Transit Gateway
 resource "aws_ec2_transit_gateway_route_table_association" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -69,7 +74,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "default" {
 # Allow traffic from the Transit Gateway to the VPC attachments
 # Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -80,7 +85,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
 # https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html
 module "transit_gateway_route" {
   source                         = "./modules/transit_gateway_route"
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
   route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
@@ -92,7 +97,7 @@ module "transit_gateway_route" {
 # Only route to VPCs of the environments defined in `route_to` attribute
 module "subnet_route" {
   source                  = "./modules/subnet_route"
-  for_each                = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  for_each                = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? { for k, v in var.config : k => v if v.attach_to_additional_only == false } : {}
   transit_gateway_id      = local.transit_gateway_id
   route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
   destination_cidr_blocks = each.value["route_to_cidr_blocks"] != null ? each.value["route_to_cidr_blocks"] : ([for i in setintersection(keys(var.config), (each.value["route_to"] != null ? each.value["route_to"] : [])) : var.config[i]["vpc_cidr"]])

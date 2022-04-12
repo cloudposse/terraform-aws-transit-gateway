@@ -94,13 +94,17 @@ variable "config" {
     route_to                          = set(string)
     route_to_cidr_blocks              = set(string)
     transit_gateway_vpc_attachment_id = string
+    attach_to_additional_only         = bool
     static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
     }))
   }))
 
-  description = "Configuration for VPC attachments, Transit Gateway routes, and subnet routes"
+  description = <<-EOT
+  Configuration for VPC attachments, Transit Gateway routes, and subnet routes
+  Attribute `attach_to_additional_only` means this config will only attach to additional tgw-rt
+  EOT
   default     = null
 }
 
@@ -140,6 +144,12 @@ variable "create_transit_gateway_route_table_association_and_propagation" {
   description = "Whether to create Transit Gateway Route Table associations and propagations"
 }
 
+variable "create_additional_transit_gateway_route_table_association_and_propagation" {
+  type        = bool
+  default     = true
+  description = "Whether to create Additiontal Transit Gateway Route Table associations and propagations"
+}
+
 variable "route_keys_enabled" {
   type        = bool
   default     = false
@@ -166,4 +176,16 @@ variable "transit_gateway_description" {
   type        = string
   default     = ""
   description = "Transit Gateway description. If not provided, one will be automatically generated."
+}
+
+variable "transit_gateway_route_table_name_override" {
+  type        = string
+  default     = null
+  description = "Transit Gateway name override. If not provided, same name as Transit Gateway will be used."
+}
+
+variable "addtional_transit_gateway_route_table" {
+  type        = string
+  default     = null
+  description = "Add an additional Transit Gateway, and value will be the name of this tgw."
 }
