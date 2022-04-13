@@ -2,10 +2,8 @@ name: auto-release
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - production
+    branches-ignore:
+      - "**"
 
 jobs:
   publish:
