@@ -2,7 +2,7 @@ locals {
   transit_gateway_id = var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "" ? var.existing_transit_gateway_id : (
     module.this.enabled && var.create_transit_gateway ? aws_ec2_transit_gateway.default[0].id : null
   )
-  transit_gateway_route_table_id = var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "" ? var.existing_transit_gateway_route_table_id : (
+  transit_gateway_route_table_id = var.existing_transit_gateway_inspection_route_table_id != null && var.existing_transit_gateway_inspection_route_table_id != "" ? var.existing_transit_gateway_inspection_route_table_id : (
     module.this.enabled && var.create_transit_gateway_route_table ? aws_ec2_transit_gateway_route_table.default[0].id : null
   )
   # NOTE: This is the same logic as local.transit_gateway_id but we cannot reuse that local in the data source or
@@ -41,12 +41,12 @@ data "aws_ec2_transit_gateway" "this" {
 }
 
 data "aws_vpc" "default" {
-  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? { for k, v in var.config : k => v if v.transit_gateway_vpc_attachment_id == null } : {}
   id       = each.value["vpc_id"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
-  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? { for k, v in var.config : k => v if v.transit_gateway_vpc_attachment_id == null } : {}
   transit_gateway_id     = local.transit_gateway_id
   vpc_id                 = each.value["vpc_id"]
   subnet_ids             = each.value["subnet_ids"]

@@ -1,5 +1,5 @@
 locals {
-  transit_gateway_transit_route_table_id = var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "" ? var.existing_transit_gateway_route_table_id : (
+  transit_gateway_transit_route_table_id = var.existing_transit_gateway_transit_route_table_id != null && var.existing_transit_gateway_transit_route_table_id != "" ? var.existing_transit_gateway_transit_route_table_id : (
     module.this.enabled && var.create_transit_gateway_route_table && var.transit_gateway_transit_route_table_name_override != null ? aws_ec2_transit_gateway_route_table.transit[0].id : null
   )
 }
