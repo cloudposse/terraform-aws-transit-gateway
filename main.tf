@@ -12,13 +12,14 @@ locals {
 
 resource "aws_ec2_transit_gateway" "default" {
   count                           = module.this.enabled && var.create_transit_gateway ? 1 : 0
-  description                     = format("%s Transit Gateway", module.this.id)
+  description                     = var.transit_gateway_description == "" ? format("%s Transit Gateway", module.this.id) : var.transit_gateway_description
   auto_accept_shared_attachments  = var.auto_accept_shared_attachments
   default_route_table_association = var.default_route_table_association
   default_route_table_propagation = var.default_route_table_propagation
   dns_support                     = var.dns_support
   vpn_ecmp_support                = var.vpn_ecmp_support
   tags                            = module.this.tags
+  transit_gateway_cidr_blocks     = var.transit_gateway_cidr_blocks
 }
 
 module "routes_label" {
@@ -58,12 +59,13 @@ module "vpc_attach_label" {
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
-  for_each           = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
-  transit_gateway_id = local.transit_gateway_id
-  vpc_id             = each.value["vpc_id"]
-  subnet_ids         = each.value["subnet_ids"]
-  dns_support        = var.vpc_attachment_dns_support
-  ipv6_support       = var.vpc_attachment_ipv6_support
+  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  transit_gateway_id     = local.transit_gateway_id
+  vpc_id                 = each.value["vpc_id"]
+  subnet_ids             = each.value["subnet_ids"]
+  appliance_mode_support = var.vpc_attachment_appliance_mode_support
+  dns_support            = var.vpc_attachment_dns_support
+  ipv6_support           = var.vpc_attachment_ipv6_support
   tags = merge(
     module.vpc_attach_label.tags,
     {

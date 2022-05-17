@@ -7,7 +7,28 @@ variable "ram_resource_share_enabled" {
 variable "ram_principal" {
   type        = string
   default     = null
-  description = "The principal to associate with the resource share. Possible values are an AWS account ID, an Organization ARN, or an Organization Unit ARN. If this is not provided and `ram_resource_share_enabled` is set to `true`, the Organization ARN will be used"
+  description = <<-EOT
+    DEPRECATED, please use ram_principals instead.
+
+    The principal to associate with the resource share. Possible values are an
+    AWS account ID, an Organization ARN, or an Organization Unit ARN.
+  EOT
+}
+
+variable "ram_principals" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    A list of principals to associate with the resource share. Possible values
+    are:
+
+    * AWS account ID
+    * Organization ARN
+    * Organization Unit ARN
+
+    If this (and var.ram_principal) is not provided and
+    `ram_resource_share_enabled` is `true`, the Organization ARN will be used.
+  EOT
 }
 
 variable "auto_accept_shared_attachments" {
@@ -44,6 +65,12 @@ variable "allow_external_principals" {
   type        = bool
   default     = false
   description = "Indicates whether principals outside your organization can be associated with a resource share"
+}
+
+variable "vpc_attachment_appliance_mode_support" {
+  type        = string
+  default     = "disable"
+  description = "Whether Appliance Mode support is enabled. If enabled, a traffic flow between a source and destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable`, `enable`"
 }
 
 variable "vpc_attachment_dns_support" {
@@ -123,4 +150,20 @@ variable "route_keys_enabled" {
     cascade to a long list of changes because the index or order has changed, but
     this will work when the `true` setting generates the error `The "for_each" value depends on resource attributes...`
     EOT
+}
+
+variable "transit_gateway_cidr_blocks" {
+  type        = list(string)
+  default     = null
+  description = <<-EOT
+    The list of associated CIDR blocks. It can contain up to 1 IPv4 CIDR block
+    of size up to /24 and up to one IPv6 CIDR block of size up to /64. The IPv4
+    block must not be from range 169.254.0.0/16.
+  EOT
+}
+
+variable "transit_gateway_description" {
+  type        = string
+  default     = ""
+  description = "Transit Gateway description. If not provided, one will be automatically generated."
 }
