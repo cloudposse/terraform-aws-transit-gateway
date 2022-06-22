@@ -233,3 +233,52 @@ variable "subnet_route_to_transit_gateway" {
   description = "Block for adding routes to the selected subenets to this Transit Gateway"
   default     = null
 }
+
+variable "amazon_side_asn" {
+  type        = number
+  default     = 64512
+  description = <<-EOT
+    Private Autonomous System Number (ASN) for the Amazon side of a BGP session. 
+    The range is 64512 to 65534 for 16-bit ASNs and 4200000000 to 4294967294 for 32-bit ASNs. 
+    Default value: 64512
+  EOT
+  validation {
+    condition = (
+      var.amazon_side_asn >= 64512 &&
+      var.amazon_side_asn <= 65534
+    )
+    error_message = "ASN must be between 64512 and 65534."
+  }
+}
+
+variable "create_transit_gateway_peering_attachment" {
+  type        = bool
+  default     = false
+  description = "Whether to create Transit Gateway Peering Attachments"
+}
+
+variable "transit_gateway_peering_attachment_config" {
+  type = map(object({
+    peer_account_id         = number
+    peer_region             = string
+    peer_transit_gateway_id = string
+  }))
+
+  description = "Config for creat TGW peering attachment"
+  default     = null
+}
+
+variable "create_transit_gateway_peering_attachment_accepter" {
+  type        = bool
+  default     = false
+  description = "Whether to create Transit Gateway Peering Attachments Accepter"
+}
+
+variable "transit_gateway_peering_attachment_accepter_config" {
+  type = map(object({
+    transit_gateway_attachment_id = string
+  }))
+
+  description = "Config for creat TGW peering attachment accepter"
+  default     = null
+}

@@ -20,6 +20,7 @@ resource "aws_ec2_transit_gateway" "default" {
   vpn_ecmp_support                = var.vpn_ecmp_support
   tags                            = module.this.tags
   transit_gateway_cidr_blocks     = var.transit_gateway_cidr_blocks
+  amazon_side_asn                 = var.amazon_side_asn
 }
 
 resource "aws_ec2_transit_gateway_route_table" "default" {
@@ -124,3 +125,27 @@ module "extra_subnet_route" {
   depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, aws_ec2_transit_gateway_vpc_attachment.default]
 }
 
+resource "aws_ec2_transit_gateway_peering_attachment" "default" {
+  for_each                = module.this.enabled && var.create_transit_gateway_peering_attachment && var.transit_gateway_peering_attachment_config != null ? var.transit_gateway_peering_attachment_config : {}
+  peer_account_id         = each.value["peer_account_id"]
+  peer_region             = each.value["peer_region"]
+  peer_transit_gateway_id = each.value["peer_transit_gateway_id"]
+  transit_gateway_id      = local.transit_gateway_id
+  tags = merge(
+    module.this.tags,
+    {
+      "Name" = "${module.this.id}-${each.key}-peering-attachment"
+    },
+  )
+}
+
+resource "aws_ec2_transit_gateway_peering_attachment_accepter" "default" {
+  for_each                      = module.this.enabled && var.create_transit_gateway_peering_attachment_accepter && var.transit_gateway_peering_attachment_accepter_config != null ? var.transit_gateway_peering_attachment_accepter_config : {}
+  transit_gateway_attachment_id = each.value["transit_gateway_attachment_id"]
+  tags = merge(
+    module.this.tags,
+    {
+      "Name" = "${module.this.id}-${each.key}-peering-attachment-accepter"
+    },
+  )
+}
