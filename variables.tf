@@ -31,6 +31,12 @@ variable "ram_principals" {
   EOT
 }
 
+variable "amazon_side_asn" {
+  type        = number
+  default     = 64512
+  description = "Private Autonomous System Number (ASN) for the Amazon side of a BGP session. Valid values: 64512-65534 for 16-bit ASNs, 4200000000-4294967294 for 32-bit ASNs. Default value: `64512`"
+}
+
 variable "auto_accept_shared_attachments" {
   type        = string
   default     = "enable"
