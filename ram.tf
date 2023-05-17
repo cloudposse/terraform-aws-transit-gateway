@@ -21,7 +21,7 @@ resource "aws_ram_resource_share" "default" {
 
 # Share the Transit Gateway with the Organization if RAM principal was not provided
 data "aws_organizations_organization" "default" {
-  count = var.ram_resource_share_enabled && ! local.ram_principals_provided ? 1 : 0
+  count = var.ram_resource_share_enabled && !local.ram_principals_provided ? 1 : 0
 }
 
 resource "aws_ram_resource_association" "default" {
