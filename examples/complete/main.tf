@@ -6,7 +6,7 @@ module "vpc_prod" {
   source  = "cloudposse/vpc/aws"
   version = "2.1.0"
 
-  ipv4_cidr_block = "172.16.0.0/16"
+  ipv4_primary_cidr_block = "172.16.0.0/16"
 
   enabled    = true
   attributes = ["prod"]
@@ -34,7 +34,7 @@ module "vpc_staging" {
   source  = "cloudposse/vpc/aws"
   version = "2.1.0"
 
-  ipv4_cidr_block = "172.32.0.0/16"
+  ipv4_primary_cidr_block = "172.32.0.0/16"
 
   enabled    = true
   attributes = ["staging"]
@@ -62,7 +62,7 @@ module "vpc_dev" {
   source  = "cloudposse/vpc/aws"
   version = "2.1.0"
 
-  ipv4_cidr_block = "172.48.0.0/16"
+  ipv4_primary_cidr_block = "172.48.0.0/16"
 
   enabled    = true
   attributes = ["dev"]
