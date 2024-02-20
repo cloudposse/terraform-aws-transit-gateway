@@ -4,9 +4,9 @@ provider "aws" {
 
 module "vpc_prod" {
   source  = "cloudposse/vpc/aws"
-  version = "0.18.2"
+  version = "2.1.0"
 
-  cidr_block = "172.16.0.0/16"
+  ipv4_primary_cidr_block = "172.16.0.0/16"
 
   enabled    = true
   attributes = ["prod"]
@@ -15,12 +15,12 @@ module "vpc_prod" {
 
 module "subnets_prod" {
   source  = "cloudposse/dynamic-subnets/aws"
-  version = "0.34.0"
+  version = "2.4.1"
 
   availability_zones      = var.availability_zones
   vpc_id                  = module.vpc_prod.vpc_id
-  igw_id                  = module.vpc_prod.igw_id
-  cidr_block              = module.vpc_prod.vpc_cidr_block
+  igw_id                  = [module.vpc_prod.igw_id]
+  ipv4_cidr_block         = [module.vpc_prod.vpc_cidr_block]
   nat_gateway_enabled     = false
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
@@ -32,9 +32,9 @@ module "subnets_prod" {
 
 module "vpc_staging" {
   source  = "cloudposse/vpc/aws"
-  version = "0.18.2"
+  version = "2.1.0"
 
-  cidr_block = "172.32.0.0/16"
+  ipv4_primary_cidr_block = "172.32.0.0/16"
 
   enabled    = true
   attributes = ["staging"]
@@ -43,12 +43,12 @@ module "vpc_staging" {
 
 module "subnets_staging" {
   source  = "cloudposse/dynamic-subnets/aws"
-  version = "0.34.0"
+  version = "2.4.1"
 
   availability_zones      = var.availability_zones
   vpc_id                  = module.vpc_staging.vpc_id
-  igw_id                  = module.vpc_staging.igw_id
-  cidr_block              = module.vpc_staging.vpc_cidr_block
+  igw_id                  = [module.vpc_staging.igw_id]
+  ipv4_cidr_block         = [module.vpc_staging.vpc_cidr_block]
   nat_gateway_enabled     = false
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
@@ -60,9 +60,9 @@ module "subnets_staging" {
 
 module "vpc_dev" {
   source  = "cloudposse/vpc/aws"
-  version = "0.18.2"
+  version = "2.1.0"
 
-  cidr_block = "172.48.0.0/16"
+  ipv4_primary_cidr_block = "172.48.0.0/16"
 
   enabled    = true
   attributes = ["dev"]
@@ -71,12 +71,12 @@ module "vpc_dev" {
 
 module "subnets_dev" {
   source  = "cloudposse/dynamic-subnets/aws"
-  version = "0.34.0"
+  version = "2.4.1"
 
   availability_zones      = var.availability_zones
   vpc_id                  = module.vpc_dev.vpc_id
-  igw_id                  = module.vpc_dev.igw_id
-  cidr_block              = module.vpc_dev.vpc_cidr_block
+  igw_id                  = [module.vpc_dev.igw_id]
+  ipv4_cidr_block         = [module.vpc_dev.vpc_cidr_block]
   nat_gateway_enabled     = false
   nat_instance_enabled    = false
   map_public_ip_on_launch = false
