@@ -11,7 +11,9 @@ resource "aws_route" "keys" {
   destination_cidr_block = each.value[1]
 
   timeouts {
-    create = "5m"
+    create = var.route_timeouts.create
+    delete = var.route_timeouts.delete
+    update = var.route_timeouts.update
   }
 }
 
@@ -22,6 +24,8 @@ resource "aws_route" "count" {
   destination_cidr_block = local.route_config_list[count.index][1]
 
   timeouts {
-    create = "5m"
+    create = var.route_timeouts.create
+    delete = var.route_timeouts.delete
+    update = var.route_timeouts.update
   }
 }
