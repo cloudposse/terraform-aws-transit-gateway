@@ -19,11 +19,11 @@ variable "route_keys_enabled" {
 }
 
 variable "route_timeouts" {
-  type        = object({
+  type = object({
     create = optional(string),
     delete = optional(string),
     update = optional(string)
   })
   description = "aws_route resource timeouts"
-  default     = {}
+  default = {}
 }
