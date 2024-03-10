@@ -94,7 +94,7 @@ variable "config" {
     route_to                          = set(string)
     route_to_cidr_blocks              = set(string)
     transit_gateway_vpc_attachment_id = string
-    static_routes                     = set(object({
+    static_routes = set(object({
       blackhole              = bool
       destination_cidr_block = string
     }))
@@ -175,5 +175,5 @@ variable "route_timeouts" {
     update = optional(string)
   })
   description = "aws_route resource timeouts"
-  default = {}
+  default     = {}
 }

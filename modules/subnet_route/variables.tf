@@ -25,5 +25,5 @@ variable "route_timeouts" {
     update = optional(string)
   })
   description = "aws_route resource timeouts"
-  default = {}
+  default     = {}
 }
