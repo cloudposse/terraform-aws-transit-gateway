@@ -167,3 +167,13 @@ variable "transit_gateway_description" {
   default     = ""
   description = "Transit Gateway description. If not provided, one will be automatically generated."
 }
+
+variable "route_timeouts" {
+  type = object({
+    create = optional(string),
+    delete = optional(string),
+    update = optional(string)
+  })
+  description = "aws_route resource timeouts"
+  default     = {}
+}
