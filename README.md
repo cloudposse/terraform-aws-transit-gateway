@@ -31,7 +31,7 @@ Terraform module to provision:
 
 - [AWS Transit Gateway](https://aws.amazon.com/transit-gateway/)
 - [AWS Resource Access Manager (AWS RAM)](https://docs.aws.amazon.com/ram/latest/userguide/what-is.html) Resource Share to share the Transit Gateway with
-  the Organization or another AWS Account (configurable via the variables `ram_resource_share_enabled` and `ram_principal`)
+  the Organization or another AWS Account (configurable via the variables `ram_resource_share_enabled` and `ram_principals`)
 - [Transit Gateway route table](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html)
 - [Transit Gateway VPC attachments](https://docs.aws.amazon.com/vpc/latest/tgw/tgw-vpc-attachments.html) to connect multiple VPCs via the Transit Gateway
 - Transit Gateway route table propagations to create propagated routes and allow traffic from the Transit Gateway to the VPC attachments
