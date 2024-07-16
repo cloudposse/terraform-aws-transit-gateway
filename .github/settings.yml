@@ -5,3 +5,4 @@ repository:
   description: Terraform module to provision AWS Transit Gateway, AWS Resource Access Manager (AWS RAM) Resource, and share the Transit Gateway with the Organization or another AWS Account.
   homepage: https://cloudposse.com/accelerate
   topics: transit-gateway, terraform-modules, vpc-attachment, aws
+
