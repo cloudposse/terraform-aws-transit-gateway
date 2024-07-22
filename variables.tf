@@ -46,13 +46,13 @@ variable "auto_accept_shared_attachments" {
 variable "default_route_table_association" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments are automatically associated with the default association route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments are automatically associated with the default association route table. Valid values: `disable`, `enable`. Default value: `disable`"
 }
 
 variable "default_route_table_propagation" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `disable`"
 }
 
 variable "dns_support" {
@@ -172,4 +172,14 @@ variable "transit_gateway_description" {
   type        = string
   default     = ""
   description = "Transit Gateway description. If not provided, one will be automatically generated."
+}
+
+variable "route_timeouts" {
+  type = object({
+    create = optional(string),
+    delete = optional(string),
+    update = optional(string)
+  })
+  description = "aws_route resource timeouts"
+  default     = {}
 }

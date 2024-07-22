@@ -1,0 +1,8 @@
+# Upstream changes from _extends are only recognized when modifications are made to this file in the default branch.
+_extends: .github
+repository:
+  name: terraform-aws-transit-gateway
+  description: Terraform module to provision AWS Transit Gateway, AWS Resource Access Manager (AWS RAM) Resource, and share the Transit Gateway with the Organization or another AWS Account.
+  homepage: https://cloudposse.com/accelerate
+  topics: transit-gateway, terraform-modules, vpc-attachment, aws
+
