@@ -4,7 +4,7 @@ locals {
     concat(
       var.ram_principal == null ? [] : [var.ram_principal],
       var.ram_principals,
-      )
+    )
   ) : [])
 }
 
@@ -35,7 +35,7 @@ resource "aws_ram_principal_association" "default" {
 }
 
 resource "aws_ram_principal_association" "org_arn" {
-  count = var.ram_resource_share_enabled && !local.ram_principals_provided ? 1 : 0
+  count              = var.ram_resource_share_enabled && !local.ram_principals_provided ? 1 : 0
   principal          = data.aws_organizations_organization.default[0].arn
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
 

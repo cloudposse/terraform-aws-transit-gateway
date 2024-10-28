@@ -21,7 +21,7 @@
 #
 
 module "this" {
-  source  = "../null-label"
+  source = "../null-label"
   #version = "0.25.0" # requires Terraform >= 0.13.0
 
   enabled             = var.enabled

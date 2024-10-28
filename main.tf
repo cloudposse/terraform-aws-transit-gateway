@@ -1,5 +1,5 @@
 locals {
-  lookup_transit_gateway = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway || var.create_transit_gateway_vpc_attachment || var.create_transit_gateway_route_table)
+  lookup_transit_gateway             = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway || var.create_transit_gateway_vpc_attachment || var.create_transit_gateway_route_table)
   lookup_transit_gateway_route_table = module.this.enabled && ((var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "") || var.create_transit_gateway_route_table || var.create_transit_gateway_route_table_association_and_propagation)
 }
 
@@ -19,7 +19,7 @@ resource "aws_ec2_transit_gateway" "default" {
 # See resource "aws_ec2_transit_gateway_vpc_attachment" below.
 data "aws_ec2_transit_gateway" "this" {
   count = local.lookup_transit_gateway ? 1 : 0
-  id    = var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "" ? var.existing_transit_gateway_id : (
+  id = var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "" ? var.existing_transit_gateway_id : (
     module.this.enabled && var.create_transit_gateway ? aws_ec2_transit_gateway.default[0].id : null
   )
 
