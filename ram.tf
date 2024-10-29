@@ -24,14 +24,23 @@ data "aws_organizations_organization" "default" {
 
 resource "aws_ram_resource_association" "default" {
   count              = var.ram_resource_share_enabled ? 1 : 0
-  resource_arn       = try(aws_ec2_transit_gateway.default[0].arn, "")
+  resource_arn       = try(data.aws_ec2_transit_gateway.this[0].arn, "")
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
+
+  depends_on = [
+    data.aws_ec2_transit_gateway.this,
+    aws_ram_resource_share.default
+  ]
 }
 
 resource "aws_ram_principal_association" "default" {
   for_each           = local.ram_principals
   principal          = each.value
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
+
+  depends_on = [
+    aws_ram_resource_share.default
+  ]
 }
 
 resource "aws_ram_principal_association" "org_arn" {
@@ -40,6 +49,7 @@ resource "aws_ram_principal_association" "org_arn" {
   resource_share_arn = try(aws_ram_resource_share.default[0].id, "")
 
   depends_on = [
+    aws_ram_resource_share.default,
     data.aws_organizations_organization.default
   ]
 }
