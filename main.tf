@@ -55,8 +55,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   # https://github.com/terraform-providers/terraform-provider-aws/issues/13512
   # https://github.com/terraform-providers/terraform-provider-aws/issues/8383
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment
-  transit_gateway_default_route_table_association = data.aws_ec2_transit_gateway.this[0].owner_id == data.aws_vpc.default[each.key].owner_id ? false : null
-  transit_gateway_default_route_table_propagation = data.aws_ec2_transit_gateway.this[0].owner_id == data.aws_vpc.default[each.key].owner_id ? false : null
+  transit_gateway_default_route_table_association = each.value["transit_gateway_default_route_table_association"]
+  transit_gateway_default_route_table_propagation = each.value["transit_gateway_default_route_table_propagation"]
 }
 
 # Allow traffic from the VPC attachments to the Transit Gateway
