@@ -50,11 +50,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   ipv6_support           = var.vpc_attachment_ipv6_support
   tags                   = module.this.tags
 
-  # transit_gateway_default_route_table_association and transit_gateway_default_route_table_propagation
-  # must be set to `false` if the VPC is in the same account as the Transit Gateway, and `null` otherwise
-  # https://github.com/terraform-providers/terraform-provider-aws/issues/13512
-  # https://github.com/terraform-providers/terraform-provider-aws/issues/8383
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment
   transit_gateway_default_route_table_association = each.value["transit_gateway_default_route_table_association"]
   transit_gateway_default_route_table_propagation = each.value["transit_gateway_default_route_table_propagation"]
 }
