@@ -9,7 +9,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "default" {
   peer_account_id         = each.value["peering_peer_account_id"]
   peer_region             = each.value["peering_peer_region"]
   peer_transit_gateway_id = each.value["peering_peer_transit_gateway_id"]
-  tags                    = merge(module.this.tags, { Name = "${module.this.id}${module.this.delimeter}${each.key}${module.this.delimeter}attachment" })
+  tags                    = merge(module.this.tags, { Name = "${module.this.id}${module.this.delimiter}${each.key}${module.this.delimiter}attachment" })
 
   dynamic "options" {
     for_each = each.value["peering_enable_dynamic_routing"] != null ? [each.value["peering_enable_dynamic_routing"]] : []
