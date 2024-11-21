@@ -8,6 +8,9 @@ locals {
   # NOTE: This is the same logic as local.transit_gateway_id but we cannot reuse that local in the data source or
   # we get the dreaded error: "count" value depends on resource attributes
   lookup_transit_gateway = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)
+
+  tgw_vpc_attachments = { for k, v in var.config : k => v.vpc_id if v.vpc_id != null }
+  tgw_peering_attachments = { for k, v in var.config : k => v.vpc_id if v.peering_peer_account_id != null }
 }
 
 resource "aws_ec2_transit_gateway" "default" {
@@ -36,22 +39,8 @@ data "aws_ec2_transit_gateway" "this" {
 }
 
 data "aws_vpc" "default" {
-  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
+  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_vpc_attachments != null ? local.tgw_vpc_attachments : {}
   id       = each.value["vpc_id"]
-}
-
-resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
-  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
-  transit_gateway_id     = local.transit_gateway_id
-  vpc_id                 = each.value["vpc_id"]
-  subnet_ids             = each.value["subnet_ids"]
-  appliance_mode_support = var.vpc_attachment_appliance_mode_support
-  dns_support            = var.vpc_attachment_dns_support
-  ipv6_support           = var.vpc_attachment_ipv6_support
-  tags                   = module.this.tags
-
-  transit_gateway_default_route_table_association = each.value["transit_gateway_default_route_table_association"]
-  transit_gateway_default_route_table_propagation = each.value["transit_gateway_default_route_table_propagation"]
 }
 
 # Allow traffic from the VPC attachments to the Transit Gateway
