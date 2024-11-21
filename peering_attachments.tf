@@ -2,16 +2,16 @@ locals {
   tgw_peering_attachments = { for k, v in var.config : k => v.vpc_id if v.peering_peer_account_id != null }
 }
 
-resource "ec2_transit_gateway_peering_attachment" "default" {
+resource "aws_ec2_transit_gateway_peering_attachment" "default" {
   for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_peering_attachments ? local.tgw_peering_attachments : {}
 
-  transit_gateway_id     = local.transit_gateway_id
-  peer_account_id        = each.value["peering_peer_account_id"]
-  peer_region            = each.value["peering_peer_region"]
-  peer_tranit_gateway_id = each.value["peering_peer_tranit_gateway_id"]
-  tags                   = module.this.tags
+  transit_gateway_id      = local.transit_gateway_id
+  peer_account_id         = each.value["peering_peer_account_id"]
+  peer_region             = each.value["peering_peer_region"]
+  peer_transit_gateway_id = each.value["peering_peer_transit_gateway_id"]
+  tags                    = module.this.tags
 
-  options = {
+  options {
     dynamic_routing = each.value["peering_enable_dynamic_routing"]
   }
 }
@@ -19,7 +19,7 @@ resource "ec2_transit_gateway_peering_attachment" "default" {
 # Allow traffic from the VPC attachments to the Transit Gateway
 resource "aws_ec2_transit_gateway_route_table_association" "peering_attachment" {
   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && local.tgw_peering_attachments != null ? local.tgw_peering_attachments : {}
-  transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : ec2_transit_gateway_peering_attachment.default[each.key]["id"]
+  transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_peering_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
 
@@ -27,7 +27,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "peering_attachment" 
 # Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "peering_attachment" {
   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && local.tgw_peering_attachments != null ? local.tgw_peering_attachments : {}
-  transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : ec2_transit_gateway_peering_attachment.default[each.key]["id"]
+  transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_peering_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
 
@@ -38,11 +38,11 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "peering_attachment" 
 # module "transit_gateway_route_peering_attachment" {
 #   source                         = "./modules/transit_gateway_route"
 #   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && local.tgw_peering_attachments != null ? local.tgw_peering_attachments : {}
-#   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : ec2_transit_gateway_peering_attachment.default[each.key]["id"]
+#   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_peering_attachment.default[each.key]["id"]
 #   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 #   route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
 # 
-#   depends_on = [ec2_transit_gateway_peering_attachment.default, aws_ec2_transit_gateway_route_table.default]
+#   depends_on = [aws_ec2_transit_gateway_peering_attachment.default, aws_ec2_transit_gateway_route_table.default]
 # }
 # 
 # # Create routes in the subnets' route tables to route traffic from subnets to the Transit Gateway VPC attachments
@@ -56,5 +56,5 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "peering_attachment" 
 #   route_keys_enabled      = var.route_keys_enabled
 #   route_timeouts          = var.route_timeouts
 # 
-#   depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, ec2_transit_gateway_peering_attachment.default]
+#   depends_on = [aws_ec2_transit_gateway.default, data.aws_ec2_transit_gateway.this, aws_ec2_transit_gateway_peering_attachment.default]
 # }

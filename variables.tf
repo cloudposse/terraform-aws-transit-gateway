@@ -101,10 +101,10 @@ variable "config" {
       destination_cidr_block = string
     })))
 
-    peering_peer_account_id        = optional(string)
-    peering_peer_region            = optional(string)
-    peering_peer_tranit_gateway_id = optional(string)
-    peering_enable_dynamic_routing = optional(string)
+    peering_peer_account_id         = optional(string)
+    peering_peer_region             = optional(string)
+    peering_peer_transit_gateway_id = optional(string)
+    peering_enable_dynamic_routing  = optional(string)
   }))
 
   description = "Configuration for VPC attachments, peering attachments, Transit Gateway routes, and subnet routes"
