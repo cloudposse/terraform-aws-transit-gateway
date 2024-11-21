@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment" "default" {
-  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_peering_attachments ? local.tgw_peering_attachments : {}
+  for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_peering_attachments != null ? local.tgw_peering_attachments : {}
 
   transit_gateway_id      = local.transit_gateway_id
   peer_account_id         = each.value["peering_peer_account_id"]

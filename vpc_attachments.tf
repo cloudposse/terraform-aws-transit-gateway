@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
-  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_vpc_attachments ? local.tgw_vpc_attachments : {}
+  for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_vpc_attachments != null ? local.tgw_vpc_attachments : {}
   transit_gateway_id     = local.transit_gateway_id
   vpc_id                 = each.value["vpc_id"]
   subnet_ids             = each.value["subnet_ids"]
