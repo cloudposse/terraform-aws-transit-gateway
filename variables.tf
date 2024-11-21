@@ -104,7 +104,7 @@ variable "config" {
     peering_peer_account_id         = optional(string)
     peering_peer_region             = optional(string)
     peering_peer_transit_gateway_id = optional(string)
-    peering_enable_dynamic_routing  = optional(string)
+    peering_enable_dynamic_routing  = optional(bool, false)
   }))
 
   description = "Configuration for VPC attachments, peering attachments, Transit Gateway routes, and subnet routes"
