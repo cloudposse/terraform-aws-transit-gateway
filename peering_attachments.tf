@@ -30,7 +30,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "peering_attachment" 
 # Allow traffic from the Transit Gateway to the VPC attachments
 # Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "peering_attachment" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && local.tgw_peering_attachments != null ? local.tgw_peering_attachments : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && local.tgw_peering_attachments != null && local.tgw_peering_attachments.peering_create_propogation ? local.tgw_peering_attachments : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_peering_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
