@@ -12,7 +12,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "default" {
   tags                    = module.this.tags
 
   options {
-    dynamic_routing = each.value["peering_enable_dynamic_routing"]
+    dynamic_routing = each.value["peering_enable_dynamic_routing"] ? "enable" : "disable"
   }
 }
 
