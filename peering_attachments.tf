@@ -1,3 +1,7 @@
+locals {
+  tgw_peering_attachments = { for k, v in var.config : k => v.vpc_id if v.peering_peer_account_id != null }
+}
+
 resource "ec2_transit_gateway_peering_attachment" "default" {
   for_each = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_peering_attachments ? local.tgw_peering_attachments : {}
 

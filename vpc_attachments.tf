@@ -1,3 +1,7 @@
+locals {
+  tgw_vpc_attachments = { for k, v in var.config : k => v.vpc_id if v.vpc_id != null }
+}
+
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && local.tgw_vpc_attachments ? local.tgw_vpc_attachments : {}
   transit_gateway_id     = local.transit_gateway_id

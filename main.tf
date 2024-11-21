@@ -8,9 +8,6 @@ locals {
   # NOTE: This is the same logic as local.transit_gateway_id but we cannot reuse that local in the data source or
   # we get the dreaded error: "count" value depends on resource attributes
   lookup_transit_gateway = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)
-
-  tgw_vpc_attachments = { for k, v in var.config : k => v.vpc_id if v.vpc_id != null }
-  tgw_peering_attachments = { for k, v in var.config : k => v.vpc_id if v.peering_peer_account_id != null }
 }
 
 resource "aws_ec2_transit_gateway" "default" {
