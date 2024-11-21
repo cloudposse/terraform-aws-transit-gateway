@@ -1,5 +1,5 @@
 locals {
-  tgw_vpc_attachments = { for k, v in var.config : k => v.vpc_id if v.vpc_id != null }
+  tgw_vpc_attachments = { for k, v in var.config : k => v if v.vpc_id != null }
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {

@@ -1,5 +1,5 @@
 locals {
-  tgw_peering_attachments = { for k, v in var.config : k => v.vpc_id if v.peering_peer_account_id != null }
+  tgw_peering_attachments = { for k, v in var.config : k => v if v.peering_peer_account_id != null }
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment" "default" {
