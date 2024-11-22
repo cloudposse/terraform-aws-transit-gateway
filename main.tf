@@ -20,6 +20,7 @@ resource "aws_ec2_transit_gateway" "default" {
   vpn_ecmp_support                = var.vpn_ecmp_support
   tags                            = module.this.tags
   transit_gateway_cidr_blocks     = var.transit_gateway_cidr_blocks
+  amazon_side_asn                 = var.amazon_side_asn
 }
 
 resource "aws_ec2_transit_gateway_route_table" "default" {
