@@ -61,7 +61,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
 
 # Allow traffic from the VPC attachments to the Transit Gateway
 resource "aws_ec2_transit_gateway_route_table_association" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -69,7 +69,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "default" {
 # Allow traffic from the Transit Gateway to the VPC attachments
 # Propagations will create propagated routes
 resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_propagation && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
 }
@@ -80,7 +80,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
 # https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html
 module "transit_gateway_route" {
   source                         = "./modules/transit_gateway_route"
-  for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
+  for_each                       = module.this.enabled && var.create_transit_gateway_routes && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
   transit_gateway_route_table_id = local.transit_gateway_route_table_id
   route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
