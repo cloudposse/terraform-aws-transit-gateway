@@ -134,10 +134,22 @@ variable "create_transit_gateway_vpc_attachment" {
   description = "Whether to create Transit Gateway VPC Attachments"
 }
 
-variable "create_transit_gateway_route_table_association_and_propagation" {
+variable "create_transit_gateway_route_table_association" {
   type        = bool
   default     = true
-  description = "Whether to create Transit Gateway Route Table associations and propagations"
+  description = "Whether to create Transit Gateway Route Table associations"
+}
+
+variable "create_transit_gateway_route_table_propagation" {
+  type        = bool
+  default     = true
+  description = "Whether to create Transit Gateway Route Table propagations"
+}
+
+variable "create_transit_gateway_routes" {
+  type        = bool
+  default     = true
+  description = "Whether to create Transit Gateway Routes"
 }
 
 variable "route_keys_enabled" {
