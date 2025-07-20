@@ -152,6 +152,12 @@ variable "route_keys_enabled" {
     EOT
 }
 
+variable "security_group_referencing_support" {
+  type        = string
+  default     = "disable"
+  description = "Whether Security Group Referencing Support is enabled. Valid values: `disable`, `enable`. Default value: `disable`"
+}
+
 variable "transit_gateway_cidr_blocks" {
   type        = list(string)
   default     = null
