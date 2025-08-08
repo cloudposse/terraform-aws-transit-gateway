@@ -1,8 +1,3 @@
-variable "security_group_referencing_support" {
-  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway. Valid values: 'enable', 'disable'."
-  type        = string
-  default     = "disable"
-}
 variable "ram_resource_share_enabled" {
   type        = bool
   default     = false
@@ -52,6 +47,12 @@ variable "default_route_table_propagation" {
   type        = string
   default     = "disable"
   description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `disable`"
+}
+
+variable "security_group_referencing_support" {
+  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway. Valid values: 'enable', 'disable'."
+  type        = string
+  default     = "disable"
 }
 
 variable "dns_support" {
