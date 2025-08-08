@@ -1,3 +1,8 @@
+variable "security_group_referencing_support" {
+  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway. Valid values: 'enable', 'disable'."
+  type        = string
+  default     = "disable"
+}
 variable "ram_resource_share_enabled" {
   type        = bool
   default     = false
