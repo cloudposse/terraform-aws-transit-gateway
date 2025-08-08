@@ -11,12 +11,11 @@ locals {
 }
 
 resource "aws_ec2_transit_gateway" "default" {
-  count                           = module.this.enabled && var.create_transit_gateway ? 1 : 0
-  description                     = var.transit_gateway_description == "" ? format("%s Transit Gateway", module.this.id) : var.transit_gateway_description
-  auto_accept_shared_attachments  = var.auto_accept_shared_attachments
-  default_route_table_association = var.default_route_table_association
-  default_route_table_propagation = var.default_route_table_propagation
-
+  count                              = module.this.enabled && var.create_transit_gateway ? 1 : 0
+  description                        = var.transit_gateway_description == "" ? format("%s Transit Gateway", module.this.id) : var.transit_gateway_description
+  auto_accept_shared_attachments     = var.auto_accept_shared_attachments
+  default_route_table_association    = var.default_route_table_association
+  default_route_table_propagation    = var.default_route_table_propagation
   security_group_referencing_support = var.security_group_referencing_support
   dns_support                        = var.dns_support
   vpn_ecmp_support                   = var.vpn_ecmp_support
