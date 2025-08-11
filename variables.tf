@@ -54,7 +54,7 @@ variable "security_group_referencing_support" {
   type        = string
   default     = "disable"
   validation {
-    condition     = var.security_group_referencing_support == "enable" || var.security_group_referencing_support == "disable"
+    condition     =  contains(["enable", "disable"], var.security_group_referencing_support)
     error_message = "security_group_referencing_support must be either 'enable' or 'disable'."
   }
 }
