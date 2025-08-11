@@ -14,8 +14,9 @@ variable "destination_cidr_blocks" {
 }
 
 variable "route_keys_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  description = "Enable route keys"
+  default     = false
 }
 
 variable "route_timeouts" {

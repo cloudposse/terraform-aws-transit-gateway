@@ -49,6 +49,12 @@ variable "default_route_table_propagation" {
   description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `disable`"
 }
 
+variable "security_group_referencing_support_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway."
+}
+
 variable "dns_support" {
   type        = string
   default     = "enable"
