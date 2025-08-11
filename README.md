@@ -2,8 +2,11 @@
 
 <!-- markdownlint-disable -->
 <a href="https://cpco.io/homepage"><img src="https://github.com/cloudposse/terraform-aws-transit-gateway/blob/main/.github/banner.png?raw=true" alt="Project Banner"/></a><br/>
-    <p align="right">
-<a href="https://github.com/cloudposse/terraform-aws-transit-gateway/releases/latest"><img src="https://img.shields.io/github/release/cloudposse/terraform-aws-transit-gateway.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://github.com/cloudposse/terraform-aws-transit-gateway/commits"><img src="https://img.shields.io/github/last-commit/cloudposse/terraform-aws-transit-gateway.svg?style=for-the-badge" alt="Last Updated"/></a><a href="https://cloudposse.com/slack"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a></p>
+
+
+<p align="right"><a href="https://github.com/cloudposse/terraform-aws-transit-gateway/releases/latest"><img src="https://img.shields.io/github/release/cloudposse/terraform-aws-transit-gateway.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://github.com/cloudposse/terraform-aws-transit-gateway/commits"><img src="https://img.shields.io/github/last-commit/cloudposse/terraform-aws-transit-gateway.svg?style=for-the-badge" alt="Last Updated"/></a><a href="https://cloudposse.com/slack"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a><a href="https://cloudposse.com/support/"><img src="https://img.shields.io/badge/Get_Support-success.svg?style=for-the-badge" alt="Get Support"/></a>
+
+</p>
 <!-- markdownlint-restore -->
 
 <!--
@@ -226,13 +229,13 @@ Here is an example of using this module in a multi-account environment (with the
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.4.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.69.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.4.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.69.0 |
 
 ## Modules
 
@@ -294,6 +297,7 @@ Here is an example of using this module in a multi-account environment (with the
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_route_keys_enabled"></a> [route\_keys\_enabled](#input\_route\_keys\_enabled) | If true, Terraform will use keys to label routes, preventing unnecessary changes,<br/>but this requires that the VPCs and subnets already exist before using this module.<br/>If false, Terraform will use numbers to label routes, and a single change may<br/>cascade to a long list of changes because the index or order has changed, but<br/>this will work when the `true` setting generates the error `The "for_each" value depends on resource attributes...` | `bool` | `false` | no |
 | <a name="input_route_timeouts"></a> [route\_timeouts](#input\_route\_timeouts) | aws\_route resource timeouts | <pre>object({<br/>    create = optional(string),<br/>    delete = optional(string),<br/>    update = optional(string)<br/>  })</pre> | `{}` | no |
+| <a name="input_security_group_referencing_support_enabled"></a> [security\_group\_referencing\_support\_enabled](#input\_security\_group\_referencing\_support\_enabled) | Enable or disable support for referencing security groups across VPCs in the transit gateway. | `bool` | `false` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `{'BusinessUnit': 'XYZ'}`).<br/>Neither the tag keys nor the tag values will be modified by this module. | `map(string)` | `{}` | no |
 | <a name="input_tenant"></a> [tenant](#input\_tenant) | ID element \_(Rarely used, not included by default)\_. A customer identifier, indicating who this instance of a resource is for | `string` | `null` | no |
@@ -373,6 +377,38 @@ In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
  6. Submit a **Pull Request** so that we can review your changes
 
 **NOTE:** Be sure to merge the latest changes from "upstream" before making a pull request!
+
+
+## Running Terraform Tests
+
+We use [Atmos](https://atmos.tools) to streamline how Terraform tests are run. It centralizes configuration and wraps common test workflows with easy-to-use commands.
+
+All tests are located in the [`test/`](test) folder.
+
+Under the hood, tests are powered by Terratest together with our internal [Test Helpers](https://github.com/cloudposse/test-helpers) library, providing robust infrastructure validation.
+
+Setup dependencies:
+- Install Atmos ([installation guide](https://atmos.tools/install/))
+- Install Go [1.24+ or newer](https://go.dev/doc/install)
+- Install Terraform or OpenTofu
+
+To run tests:
+
+- Run all tests:  
+  ```sh
+  atmos test run
+  ```
+- Clean up test artifacts:  
+  ```sh
+  atmos test clean
+  ```
+- Explore additional test options:  
+  ```sh
+  atmos test --help
+  ```
+The configuration for test commands is centrally managed. To review what's being imported, see the [`atmos.yaml`](https://raw.githubusercontent.com/cloudposse/.github/refs/heads/main/.github/atmos/terraform-module.yaml) file.
+
+Learn more about our [automated testing in our documentation](https://docs.cloudposse.com/community/contribute/automated-testing/) or implementing [custom commands](https://atmos.tools/core-concepts/custom-commands/) with atmos.
 
 ### 🌎 Slack Community
 
