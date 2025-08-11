@@ -50,9 +50,9 @@ variable "default_route_table_propagation" {
 }
 
 variable "security_group_referencing_support_enabled" {
-  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway."
   type        = bool
   default     = false
+  description = "Enable or disable support for referencing security groups across VPCs in the transit gateway."
 }
 
 variable "dns_support" {
