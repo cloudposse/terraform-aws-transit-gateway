@@ -53,6 +53,10 @@ variable "security_group_referencing_support" {
   description = "Enable or disable support for referencing security groups across VPCs in the transit gateway. Valid values: 'enable', 'disable'."
   type        = string
   default     = "disable"
+  validation {
+    condition     = var.security_group_referencing_support == "enable" || var.security_group_referencing_support == "disable"
+    error_message = "security_group_referencing_support must be either 'enable' or 'disable'."
+  }
 }
 
 variable "dns_support" {
