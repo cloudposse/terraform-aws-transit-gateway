@@ -16,7 +16,7 @@ resource "aws_ec2_transit_gateway" "default" {
   auto_accept_shared_attachments     = var.auto_accept_shared_attachments
   default_route_table_association    = var.default_route_table_association
   default_route_table_propagation    = var.default_route_table_propagation
-  security_group_referencing_support = var.security_group_referencing_support
+  security_group_referencing_support = var.security_group_referencing_support_enabled ? "enable" : "disable"
   dns_support                        = var.dns_support
   vpn_ecmp_support                   = var.vpn_ecmp_support
   tags                               = module.this.tags
