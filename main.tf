@@ -1,13 +1,6 @@
 locals {
-  transit_gateway_id = var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "" ? var.existing_transit_gateway_id : (
-    module.this.enabled && var.create_transit_gateway ? aws_ec2_transit_gateway.default[0].id : null
-  )
-  transit_gateway_route_table_id = var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "" ? var.existing_transit_gateway_route_table_id : (
-    module.this.enabled && var.create_transit_gateway_route_table ? aws_ec2_transit_gateway_route_table.default[0].id : null
-  )
-  # NOTE: This is the same logic as local.transit_gateway_id but we cannot reuse that local in the data source or
-  # we get the dreaded error: "count" value depends on resource attributes
-  lookup_transit_gateway = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway)
+  lookup_transit_gateway             = module.this.enabled && ((var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "") || var.create_transit_gateway || var.create_transit_gateway_vpc_attachment || var.create_transit_gateway_route_table)
+  lookup_transit_gateway_route_table = module.this.enabled && ((var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "") || var.create_transit_gateway_route_table || var.create_transit_gateway_route_table_association_and_propagation)
 }
 
 resource "aws_ec2_transit_gateway" "default" {
@@ -23,17 +16,38 @@ resource "aws_ec2_transit_gateway" "default" {
   transit_gateway_cidr_blocks        = var.transit_gateway_cidr_blocks
 }
 
-resource "aws_ec2_transit_gateway_route_table" "default" {
-  count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
-  transit_gateway_id = local.transit_gateway_id
-  tags               = module.this.tags
-}
-
 # Need to find out if VPC is in same account as Transit Gateway.
 # See resource "aws_ec2_transit_gateway_vpc_attachment" below.
 data "aws_ec2_transit_gateway" "this" {
   count = local.lookup_transit_gateway ? 1 : 0
-  id    = local.transit_gateway_id
+  id = var.existing_transit_gateway_id != null && var.existing_transit_gateway_id != "" ? var.existing_transit_gateway_id : (
+    module.this.enabled && var.create_transit_gateway ? aws_ec2_transit_gateway.default[0].id : null
+  )
+
+  depends_on = [
+    aws_ec2_transit_gateway.default
+  ]
+}
+
+resource "aws_ec2_transit_gateway_route_table" "default" {
+  count              = module.this.enabled && var.create_transit_gateway_route_table ? 1 : 0
+  transit_gateway_id = data.aws_ec2_transit_gateway.this[0].id
+  tags               = module.this.tags
+
+  depends_on = [
+    data.aws_ec2_transit_gateway.this
+  ]
+}
+
+data "aws_ec2_transit_gateway_route_table" "this" {
+  count = local.lookup_transit_gateway_route_table ? 1 : 0
+  id = var.existing_transit_gateway_route_table_id != null && var.existing_transit_gateway_route_table_id != "" ? var.existing_transit_gateway_route_table_id : (
+    module.this.enabled && var.create_transit_gateway_route_table ? aws_ec2_transit_gateway_route_table.default[0].id : null
+  )
+
+  depends_on = [
+    aws_ec2_transit_gateway_route_table.default
+  ]
 }
 
 data "aws_vpc" "default" {
@@ -43,7 +57,7 @@ data "aws_vpc" "default" {
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   for_each               = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
-  transit_gateway_id     = local.transit_gateway_id
+  transit_gateway_id     = data.aws_ec2_transit_gateway.this[0].id
   vpc_id                 = each.value["vpc_id"]
   subnet_ids             = each.value["subnet_ids"]
   appliance_mode_support = var.vpc_attachment_appliance_mode_support
@@ -58,13 +72,23 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "default" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment
   transit_gateway_default_route_table_association = data.aws_ec2_transit_gateway.this[0].owner_id == data.aws_vpc.default[each.key].owner_id ? false : null
   transit_gateway_default_route_table_propagation = data.aws_ec2_transit_gateway.this[0].owner_id == data.aws_vpc.default[each.key].owner_id ? false : null
+
+  depends_on = [
+    data.aws_ec2_transit_gateway.this,
+    data.aws_vpc.default
+  ]
 }
 
 # Allow traffic from the VPC attachments to the Transit Gateway
 resource "aws_ec2_transit_gateway_route_table_association" "default" {
   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
-  transit_gateway_route_table_id = local.transit_gateway_route_table_id
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this[0].id
+
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.default,
+    data.aws_ec2_transit_gateway_route_table.this
+  ]
 }
 
 # Allow traffic from the Transit Gateway to the VPC attachments
@@ -72,7 +96,12 @@ resource "aws_ec2_transit_gateway_route_table_association" "default" {
 resource "aws_ec2_transit_gateway_route_table_propagation" "default" {
   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
-  transit_gateway_route_table_id = local.transit_gateway_route_table_id
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this[0].id
+
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.default,
+    data.aws_ec2_transit_gateway_route_table.this
+  ]
 }
 
 # Static Transit Gateway routes
@@ -83,10 +112,13 @@ module "transit_gateway_route" {
   source                         = "./modules/transit_gateway_route"
   for_each                       = module.this.enabled && var.create_transit_gateway_route_table_association_and_propagation && var.config != null ? var.config : {}
   transit_gateway_attachment_id  = each.value["transit_gateway_vpc_attachment_id"] != null ? each.value["transit_gateway_vpc_attachment_id"] : aws_ec2_transit_gateway_vpc_attachment.default[each.key]["id"]
-  transit_gateway_route_table_id = local.transit_gateway_route_table_id
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this[0].id
   route_config                   = each.value["static_routes"] != null ? each.value["static_routes"] : []
 
-  depends_on = [aws_ec2_transit_gateway_vpc_attachment.default, aws_ec2_transit_gateway_route_table.default]
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.default,
+    data.aws_ec2_transit_gateway_route_table.this
+  ]
 }
 
 # Create routes in the subnets' route tables to route traffic from subnets to the Transit Gateway VPC attachments
@@ -94,7 +126,7 @@ module "transit_gateway_route" {
 module "subnet_route" {
   source                  = "./modules/subnet_route"
   for_each                = module.this.enabled && var.create_transit_gateway_vpc_attachment && var.config != null ? var.config : {}
-  transit_gateway_id      = local.transit_gateway_id
+  transit_gateway_id      = data.aws_ec2_transit_gateway.this[0].id
   route_table_ids         = each.value["subnet_route_table_ids"] != null ? each.value["subnet_route_table_ids"] : []
   destination_cidr_blocks = each.value["route_to_cidr_blocks"] != null ? each.value["route_to_cidr_blocks"] : ([for i in setintersection(keys(var.config), (each.value["route_to"] != null ? each.value["route_to"] : [])) : var.config[i]["vpc_cidr"]])
   route_keys_enabled      = var.route_keys_enabled
