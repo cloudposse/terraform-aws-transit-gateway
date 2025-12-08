@@ -34,19 +34,19 @@ variable "ram_principals" {
 variable "auto_accept_shared_attachments" {
   type        = string
   default     = "enable"
-  description = "Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`. Default value: `disable`"
+  description = "Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`"
 }
 
 variable "default_route_table_association" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments are automatically associated with the default association route table. Valid values: `disable`, `enable`. Default value: `disable`"
+  description = "Whether resource attachments are automatically associated with the default association route table. Valid values: `disable`, `enable`"
 }
 
 variable "default_route_table_propagation" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `disable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`"
 }
 
 variable "security_group_referencing_support_enabled" {
@@ -58,13 +58,13 @@ variable "security_group_referencing_support_enabled" {
 variable "dns_support" {
   type        = string
   default     = "enable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`"
 }
 
 variable "vpn_ecmp_support" {
   type        = string
   default     = "enable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`"
 }
 
 variable "allow_external_principals" {
@@ -82,31 +82,39 @@ variable "vpc_attachment_appliance_mode_support" {
 variable "vpc_attachment_dns_support" {
   type        = string
   default     = "enable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`"
 }
 
 variable "vpc_attachment_ipv6_support" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`"
 }
 
 variable "config" {
   type = map(object({
-    vpc_id                            = string
-    vpc_cidr                          = string
-    subnet_ids                        = set(string)
-    subnet_route_table_ids            = set(string)
-    route_to                          = set(string)
-    route_to_cidr_blocks              = set(string)
-    transit_gateway_vpc_attachment_id = string
-    static_routes = set(object({
+    vpc_id                                          = optional(string)
+    vpc_cidr                                        = optional(string)
+    subnet_ids                                      = optional(set(string))
+    subnet_route_table_ids                          = optional(set(string))
+    route_to_cidr_blocks                            = optional(set(string))
+    transit_gateway_default_route_table_association = optional(bool)
+    transit_gateway_default_route_table_propagation = optional(bool)
+    transit_gateway_vpc_attachment_id               = optional(string)
+    route_to                                        = optional(set(string))
+    static_routes = optional(set(object({
       blackhole              = bool
       destination_cidr_block = string
-    }))
+    })))
+
+    peering_peer_account_id         = optional(string)
+    peering_peer_region             = optional(string)
+    peering_peer_transit_gateway_id = optional(string)
+    peering_enable_dynamic_routing  = optional(bool)
+    peering_create_propogation      = optional(bool, false)
   }))
 
-  description = "Configuration for VPC attachments, Transit Gateway routes, and subnet routes"
+  description = "Configuration for VPC attachments, peering attachments, Transit Gateway routes, and subnet routes"
   default     = null
 }
 
