@@ -183,3 +183,20 @@ variable "route_timeouts" {
   description = "aws_route resource timeouts"
   default     = {}
 }
+
+variable "amazon_side_asn" {
+  type        = number
+  default     = 64512
+  description = <<-EOT
+    Private Autonomous System Number (ASN) for the Amazon side of a BGP session.
+    The range is `64512` to `65534` for 16-bit ASNs and `4200000000` to `4294967294` for 32-bit ASNs.
+
+    Changing this value forces replacement of the Transit Gateway, which destroys all associated
+    VPC attachments, RAM shares, and route tables. Set this correctly at creation time.
+
+    Distinct ASNs are required when:
+    * Peering multiple Transit Gateways (same or cross-region)
+    * Attaching to a Direct Connect Gateway
+    * Running BGP-based Site-to-Site VPN against the same on-premises router from multiple TGWs
+  EOT
+}
