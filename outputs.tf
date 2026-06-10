@@ -29,12 +29,12 @@ output "transit_gateway_vpc_attachment_ids" {
 }
 
 output "transit_gateway_route_ids" {
-  value       = try({ for i, o in module.transit_gateway_route : i => o["transit_gateway_route_ids"] }, {})
+  value       = merge(try({ for i, o in module.transit_gateway_route_vpc_attachment : i => o["transit_gateway_route_ids"] }, {}), try({ for i, o in module.transit_gateway_route_peering_attachment : i => o["transit_gateway_route_ids"] }, {}))
   description = "Transit Gateway route identifiers combined with destinations"
 }
 
 output "subnet_route_ids" {
-  value       = try({ for i, o in module.subnet_route : i => o["subnet_route_ids"] }, {})
+  value       = merge(try({ for i, o in module.subnet_route_vpc_attachment : i => o["subnet_route_ids"] }, {}), try({ for i, o in module.subnet_route_peering_attachment : i => o["subnet_route_ids"] }, {}))
   description = "Subnet route identifiers combined with destinations"
 }
 
