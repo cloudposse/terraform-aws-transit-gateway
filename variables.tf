@@ -34,7 +34,7 @@ variable "ram_principals" {
 variable "auto_accept_shared_attachments" {
   type        = string
   default     = "enable"
-  description = "Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`. Default value: `disable`"
+  description = "Whether resource attachment requests are automatically accepted. Valid values: `disable`, `enable`. Default value: `enable`"
 }
 
 variable "default_route_table_association" {
@@ -88,7 +88,7 @@ variable "vpc_attachment_dns_support" {
 variable "vpc_attachment_ipv6_support" {
   type        = string
   default     = "disable"
-  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `enable`"
+  description = "Whether resource attachments automatically propagate routes to the default propagation route table. Valid values: `disable`, `enable`. Default value: `disable`"
 }
 
 variable "config" {
